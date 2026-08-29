@@ -1,0 +1,18 @@
+# Editor / tooling
+.claude/
+.vscode/
+.idea/
+*.code-workspace
+
+# OS noise
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.DS_Store
+._*
+
+# Local scratch
+*.log
+*.tmp
+*.bak
+*~

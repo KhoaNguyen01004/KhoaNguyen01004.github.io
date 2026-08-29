@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://khoanguyen01004.github.io/sitemap.xml

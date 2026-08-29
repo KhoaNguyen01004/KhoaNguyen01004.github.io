@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found — Nguyễn Việt Anh Khoa</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0c0b0a; --text: #f2efee; --text-muted: rgba(242,239,238,.65);
+  --accent: #ff563c; --divider: rgba(242,239,238,.14);
+  --font: 'Archivo', sans-serif;
+}
+[data-theme="light"] {
+  --bg: #f3f2f1; --text: #1a1816; --text-muted: rgba(26,24,22,.65);
+  --divider: rgba(26,24,22,.15);
+}
+body {
+  min-height: 100vh; background: var(--bg); color: var(--text);
+  font-family: var(--font); display: flex; align-items: center;
+  justify-content: center; padding: 24px; text-align: left;
+}
+.wrap { max-width: 560px; width: 100%; }
+.code {
+  font-size: clamp(72px, 16vw, 140px); font-weight: 900;
+  letter-spacing: -.05em; line-height: .9; color: var(--accent);
+}
+h1 { font-size: clamp(24px, 4vw, 34px); font-weight: 900; letter-spacing: -.02em; margin-top: 18px; }
+p { color: var(--text-muted); margin-top: 12px; font-size: 15px; line-height: 1.6; }
+.rule { height: 1px; background: var(--divider); margin: 28px 0; }
+a.home {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 800; letter-spacing: .04em;
+  padding: 10px 16px; border: 1px solid var(--accent);
+  background: var(--accent); color: #0c0b0a; text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+a.home:hover { background: transparent; color: var(--accent); }
+[data-lang="en"] [data-l="vi"], [data-lang="vi"] [data-l="en"] { display: none; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="code">404</div>
+    <h1>
+      <span data-l="en">This page doesn't exist</span>
+      <span data-l="vi">Trang này không tồn tại</span>
+    </h1>
+    <p>
+      <span data-l="en">The link may be out of date, or the address mistyped. Everything on this site lives on one page.</span>
+      <span data-l="vi">Liên kết có thể đã cũ hoặc địa chỉ bị gõ sai. Toàn bộ nội dung của trang nằm trên một trang duy nhất.</span>
+    </p>
+    <div class="rule"></div>
+    <a class="home" href="/">
+      <span data-l="en">Back to the portfolio</span>
+      <span data-l="vi">Quay lại trang chính</span>
+    </a>
+  </div>
+<script>
+  try {
+    var r = document.documentElement;
+    var lang = localStorage.getItem('khoa.lang') || 'en';
+    r.dataset.lang = lang; r.lang = lang === 'vi' ? 'vi' : 'en';
+    r.dataset.theme = localStorage.getItem('khoa.theme') || 'dark';
+  } catch (e) {}
+</script>
+</body>
+</html>
