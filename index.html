@@ -534,9 +534,11 @@ nav {
 #demo-step-btn.playing .icon-play { display: none; }
 #demo-step-btn.playing .icon-pause { display: inline; }
 
-/* ─── DEMO TABS — top-level switch between the three demos. Deliberately
-   an underlined tab bar, so it never reads like the option pickers that
-   live *inside* a demo panel. ───────────────────────────────────────────── */
+/* ─── DEMO QUICK-JUMP — all three demos are stacked and always visible;
+   this is just an in-page scroll shortcut, with the active link tracking
+   whichever panel is currently in view. Deliberately an underlined tab
+   bar, so it never reads like the option pickers that live *inside* a
+   demo panel. ─────────────────────────────────────────────────────────── */
 .demo-tabs {
   display: flex; flex-wrap: wrap; gap: 28px;
   margin-top: 24px; border-bottom: 1px solid var(--divider);
@@ -546,11 +548,17 @@ nav {
   padding: 10px 0 11px; margin-bottom: -1px;
   border: 0; border-bottom: 2px solid transparent;
   background: transparent; color: var(--text-muted); cursor: pointer;
+  text-decoration: none; display: inline-block;
   transition: color .2s ease, border-color .2s ease;
 }
 .demo-tab:hover { color: var(--text); }
 .demo-tab.on { color: var(--text); border-bottom-color: var(--accent); }
-.demo-panel[hidden] { display: none; }
+
+/* Stacked panels: each one after the first is visually separated so it
+   reads as its own demo while scrolling, not a continuation of the last. */
+.demo-panel { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--divider); }
+.demo-panel:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+.demo-panel-title { margin: 0; font-size: 18px; font-weight: 800; }
 
 /* Shown only when the Three.js CDN fails, so a blocked network degrades to a
    readable message instead of an empty black rectangle. */
@@ -1113,22 +1121,25 @@ footer {
     <span class="chip" style="pointer-events:none"><span data-l="en">Interactive</span><span data-l="vi">Tương tác</span></span>
   </div>
   <p style="max-width:68ch;color:var(--text-muted);margin-top:12px">
-    <span data-l="en">Small rebuilds of the interactive pieces from each project above, running on static sample data — no backend. Pick one.</span>
-    <span data-l="vi">Bản dựng lại thu nhỏ phần tương tác của từng dự án phía trên, chạy trên dữ liệu mẫu tĩnh — không có backend. Chọn một demo.</span>
+    <span data-l="en">Small rebuilds of the interactive pieces from each project above, running on static sample data — no backend. Scroll down to try each one.</span>
+    <span data-l="vi">Bản dựng lại thu nhỏ phần tương tác của từng dự án phía trên, chạy trên dữ liệu mẫu tĩnh — không có backend. Cuộn xuống để dùng thử từng demo.</span>
   </p>
 
   <div class="demo-tabs" id="demo-tabs">
-    <button class="demo-tab on" data-demo="fleet" onclick="setDemoTab('fleet')">
+    <a class="demo-tab on" data-demo="fleet" href="#demo-panel-fleet">
       <span data-l="en">Fleet load planner</span><span data-l="vi">Xếp hàng đội xe</span>
-    </button>
-    <button class="demo-tab" data-demo="agrilens" onclick="setDemoTab('agrilens')">AgriLens</button>
-    <button class="demo-tab" data-demo="arm" onclick="setDemoTab('arm')">
+    </a>
+    <a class="demo-tab" data-demo="agrilens" href="#demo-panel-agrilens">AgriLens</a>
+    <a class="demo-tab" data-demo="arm" href="#demo-panel-arm">
       <span data-l="en">Robotic arm</span><span data-l="vi">Tay robot</span>
-    </button>
+    </a>
   </div>
 
   <!-- Panel: Fleet load planner -->
-  <div class="demo-panel" data-demo-panel="fleet">
+  <div class="demo-panel" data-demo-panel="fleet" id="demo-panel-fleet">
+    <h3 class="demo-panel-title">
+      <span data-l="en">Fleet load planner</span><span data-l="vi">Xếp hàng đội xe</span>
+    </h3>
     <p style="max-width:68ch;color:var(--text-muted);margin-top:16px">
       <span data-l="en">A mini-rebuild of the truck-load planner inside the fleet platform, using the same Three.js scene setup, door markers and package palette as production. The three trucks are real vehicles from the fleet roster, drawn to their actual cargo dimensions — same shipment, three real trucks, so the capacity difference is the trucks', not the demo's. Pick one, watch it load step by step, drag to orbit, or click a package for its specs.</span>
       <span data-l="vi">Bản dựng lại thu nhỏ của công cụ xếp hàng 3D trong nền tảng điều vận — cùng cách dựng cảnh Three.js, ký hiệu cửa xe và bảng màu kiện hàng như bản thật. Ba xe này là xe thật trong đội xe, vẽ đúng kích thước thùng thực tế — cùng một lô hàng, ba xe thật, nên khác biệt về sức chứa là do xe chứ không phải do demo. Chọn xe, xem xếp hàng từng bước, kéo để xoay, hoặc bấm vào kiện hàng để xem thông số.</span>
@@ -1184,7 +1195,8 @@ footer {
   </div>
 
   <!-- Panel: AgriLens -->
-  <div class="demo-panel" data-demo-panel="agrilens" hidden>
+  <div class="demo-panel" data-demo-panel="agrilens" id="demo-panel-agrilens">
+    <h3 class="demo-panel-title">AgriLens</h3>
     <p style="max-width:68ch;color:var(--text-muted);margin-top:16px">
       <span data-l="en">The Android app's result screen, rebuilt: pick a sample leaf, and it runs the same top-3-probability display the on-device model shows, using the real 39-class label set (38 crop/disease classes plus an explicit "Unknown" fallback) from the shipped model.</span>
       <span data-l="vi">Bản dựng lại màn hình kết quả của ứng dụng Android: chọn một mẫu lá, xem hiển thị top-3 xác suất giống hệt mô hình trên thiết bị — dùng đúng bộ 39 nhãn (38 nhóm cây/bệnh cộng nhãn "Unknown") từ mô hình đã triển khai.</span>
@@ -1204,7 +1216,10 @@ footer {
   </div>
 
   <!-- Panel: Robotic arm -->
-  <div class="demo-panel" data-demo-panel="arm" hidden>
+  <div class="demo-panel" data-demo-panel="arm" id="demo-panel-arm">
+    <h3 class="demo-panel-title">
+      <span data-l="en">Robotic arm</span><span data-l="vi">Tay robot</span>
+    </h3>
     <p style="max-width:68ch;color:var(--text-muted);margin-top:16px">
       <span data-l="en">The FastAPI backend's sorting state machine, rebuilt client-side with the exact joint order, limits, HOME pose and Grab → Lift → Move → Drop-off sequence from the real controller — same simulation mode the app falls back to with no hardware attached. Jog the joints manually, or hand it a block and watch it sort.</span>
       <span data-l="vi">Máy trạng thái phân loại của backend FastAPI, dựng lại phía client với đúng thứ tự khớp, giới hạn, tư thế HOME và trình tự Gắp → Nâng → Di chuyển → Thả như bộ điều khiển thật — cùng chế độ mô phỏng khi không có phần cứng. Điều khiển từng khớp bằng tay, hoặc đưa cho nó một khối màu và xem nó phân loại.</span>
@@ -2076,13 +2091,15 @@ function tlpPack(vehicle, seed) {
   loadVehicle(currentVehicle.id, currentSeed);
 })();
 
-/* ─── DEMO TABS ───────────────────────────────────────────────────────────── */
-let _armInited = false;
-window.setDemoTab = function(id) {
-  document.querySelectorAll('#demo-tabs .demo-tab').forEach(c => c.classList.toggle('on', c.dataset.demo === id));
-  document.querySelectorAll('.demo-panel').forEach(p => { p.hidden = p.dataset.demoPanel !== id; });
-  if (id === 'arm' && !_armInited) { _armInited = true; initArmDemo(); }
-};
+/* ─── DEMO QUICK-JUMP — panels are always stacked and visible; this just
+   tracks which one is in view and underlines the matching link. ────────── */
+const demoIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const link = document.querySelector(`#demo-tabs .demo-tab[href="#${e.target.id}"]`);
+    if (link) link.classList.toggle('on', e.isIntersecting && e.intersectionRatio > 0.2);
+  });
+}, { threshold: [0, 0.25, 0.6] });
+document.querySelectorAll('.demo-panel').forEach(p => demoIO.observe(p));
 
 /* ─── AGRILENS DEMO — same 39-class label set as agrilens/assets/labels.txt ── */
 function agrilensFormatLabel(raw) {
@@ -2587,6 +2604,8 @@ function initArmDemo() {
   updateStatus();
   animate();
 }
+
+initArmDemo();
 
 /* ─── CONTACT FORM ───────────────────────────────────────────────────────── */
 function submitForm(e) {
