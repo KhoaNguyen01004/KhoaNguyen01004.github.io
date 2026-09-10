@@ -601,62 +601,100 @@ nav {
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── AGRILENS DEMO ───────────────────────────────────────────────────── */
-.agrilens-wrap {
-  display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px;
+/* ─── DISPATCHER BOARD DEMO ────────────────────────────────────────────── */
+.dispatch-attn-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.dispatch-attn-strip:empty { display: none; }
+.dispatch-attn-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; font-size: 11px; font-weight: 800;
+  border: 1px solid var(--accent); color: var(--accent);
+  background: transparent; cursor: pointer; font-family: var(--font);
+}
+.dispatch-attn-chip.critical { background: var(--accent-dim); }
+.dispatch-attn-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+}
+
+.dispatch-wrap {
+  display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 24px;
   margin-top: 20px; align-items: start;
 }
-.agrilens-samples { display: flex; flex-direction: column; gap: 8px; }
-.agrilens-sample {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px; border: 1px solid var(--divider); background: var(--surface);
+
+.dispatch-vehicles { display: flex; flex-direction: column; gap: 8px; }
+.dispatch-vehicle {
+  display: block; width: 100%; padding: 12px;
+  border: 1px solid var(--divider); background: var(--surface);
   cursor: pointer; text-align: left; font-family: var(--font); color: var(--text);
   transition: border-color .2s ease, background .2s ease;
 }
-.agrilens-sample:hover { border-color: var(--accent); }
-.agrilens-sample.on { border-color: var(--accent); background: var(--accent-dim); }
-.agrilens-sample-icon {
-  width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
-  background: var(--surface-hi); display: flex; align-items: center; justify-content: center;
+.dispatch-vehicle:hover { border-color: var(--accent); }
+.dispatch-vehicle.on { border-color: var(--accent); background: var(--accent-dim); }
+.dispatch-vehicle-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dispatch-vehicle-plate { font-size: 13px; font-weight: 800; }
+.dispatch-vehicle-driver { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.dispatch-vehicle-stop { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.dispatch-progress-track { height: 4px; background: var(--surface-hi); margin-top: 8px; overflow: hidden; }
+.dispatch-progress-fill { height: 100%; background: var(--accent); width: 0; transition: width .4s ease; }
+.dispatch-vehicle-meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 8px; font-size: 10px; color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
-.agrilens-sample-name { font-size: 13px; font-weight: 700; }
-.agrilens-sample-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.dispatch-vehicle-flags { display: flex; gap: 5px; margin-top: 8px; }
 
-.agrilens-phone {
-  width: 100%; max-width: 280px; margin: 0 auto;
-  border: 1px solid var(--divider); border-radius: 28px;
-  background: var(--bg-raise); padding: 10px;
+.dispatch-badge {
+  display: inline-block; padding: 2px 7px; font-size: 10px; font-weight: 800;
+  letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--divider); color: var(--text-muted);
 }
-.agrilens-screen {
-  background: var(--surface); border-radius: 20px; overflow: hidden;
-  min-height: 380px; display: flex; flex-direction: column;
+.dispatch-badge.st-arrived, .dispatch-badge.st-executing { border-color: var(--accent); color: var(--accent); }
+.dispatch-badge.st-completed { border-color: var(--text-dim); color: var(--text-dim); }
+.dispatch-badge.st-skipped, .dispatch-badge.st-cancelled { border-color: var(--text-dim); color: var(--text-dim); text-decoration: line-through; }
+
+.dispatch-timeline-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.dispatch-timeline-plate { font-size: 15px; font-weight: 800; }
+.dispatch-timeline-driver { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+#dispatch-revert-btn { font-size: 11px; padding: 7px 12px; }
+
+.dispatch-current {
+  margin-top: 16px; padding: 14px; border: 1px solid var(--accent); background: var(--accent-dim); cursor: pointer;
 }
-.agrilens-leafview {
-  height: 200px; display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--text) 6%, transparent), transparent 70%);
-  border-bottom: 1px solid var(--divider);
+.dispatch-current-label { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.dispatch-current-name { font-size: 15px; font-weight: 800; margin-top: 4px; }
+.dispatch-current-addr { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.dispatch-current-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+
+.dispatch-stop-list { margin-top: 16px; border-top: 1px solid var(--divider); }
+.dispatch-stop { border-bottom: 1px solid var(--divider); }
+.dispatch-stop-head {
+  display: flex; align-items: center; gap: 10px; padding: 12px 0; cursor: pointer;
 }
-.agrilens-status {
-  padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;
+.dispatch-stop-seq {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+  background: var(--surface-hi); color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
 }
-.agrilens-results { padding: 0 16px 16px; }
-.agrilens-results[hidden] { display: none; }
-.agrilens-top-label {
-  font-size: 15px; font-weight: 800; margin-bottom: 2px;
+.dispatch-stop-name { font-size: 13px; font-weight: 700; flex: 1; min-width: 0; }
+.dispatch-move-btns { display: flex; gap: 2px; }
+.dispatch-move-btn {
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--divider); background: transparent; color: var(--text-muted); cursor: pointer; padding: 0;
 }
-.agrilens-top-conf { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
-.agrilens-bar-row { margin-bottom: 8px; }
-.agrilens-bar-head {
-  display: flex; justify-content: space-between; font-size: 11px;
-  color: var(--text-muted); margin-bottom: 3px;
+.dispatch-move-btn:disabled { opacity: .25; cursor: not-allowed; }
+.dispatch-move-btn:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+.dispatch-stop-chevron { color: var(--text-dim); transition: transform .2s ease; flex-shrink: 0; }
+.dispatch-stop.open .dispatch-stop-chevron { transform: rotate(180deg); }
+.dispatch-stop-body { padding: 0 0 14px 32px; }
+.dispatch-stop-body[hidden] { display: none; }
+.dispatch-stop-detail { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+.dispatch-stop-detail b { color: var(--text); font-weight: 700; }
+.dispatch-stop-reason { margin-top: 6px; font-size: 12px; color: var(--accent); }
+.dispatch-stop-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.dispatch-stop-actions .btn { font-size: 11px; padding: 6px 11px; }
+
+@media (max-width: 700px) {
+  .dispatch-wrap { grid-template-columns: 1fr; }
 }
-.agrilens-bar-track { height: 5px; background: var(--surface-hi); overflow: hidden; }
-.agrilens-bar-fill { height: 100%; background: var(--accent); width: 0; transition: width .6s ease; }
-.agrilens-care {
-  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--divider);
-  font-size: 12px; line-height: 1.6; color: var(--text-muted);
-}
-.agrilens-care b { color: var(--text); }
 
 /* ─── ROBOTIC ARM DEMO ────────────────────────────────────────────────── */
 .arm-wrap {
@@ -700,7 +738,6 @@ nav {
 #arm-estop-btn { border-color: var(--accent); color: var(--accent); }
 #arm-estop-btn.active { background: var(--accent); color: #fff; }
 @media (max-width: 700px) {
-  .agrilens-wrap { grid-template-columns: 1fr; }
   .arm-wrap { grid-template-columns: 1fr; }
   .arm-panel { border-left: 0; border-top: 1px solid var(--divider); }
 }
@@ -1129,7 +1166,9 @@ footer {
     <a class="demo-tab on" data-demo="fleet" href="#demo-panel-fleet">
       <span data-l="en">Fleet load planner</span><span data-l="vi">Xếp hàng đội xe</span>
     </a>
-    <a class="demo-tab" data-demo="agrilens" href="#demo-panel-agrilens">AgriLens</a>
+    <a class="demo-tab" data-demo="dispatch" href="#demo-panel-dispatch">
+      <span data-l="en">Dispatcher board</span><span data-l="vi">Bảng điều phối</span>
+    </a>
     <a class="demo-tab" data-demo="arm" href="#demo-panel-arm">
       <span data-l="en">Robotic arm</span><span data-l="vi">Tay robot</span>
     </a>
@@ -1194,23 +1233,33 @@ footer {
     </div>
   </div>
 
-  <!-- Panel: AgriLens -->
-  <div class="demo-panel" data-demo-panel="agrilens" id="demo-panel-agrilens">
-    <h3 class="demo-panel-title">AgriLens</h3>
+  <!-- Panel: Dispatcher board -->
+  <div class="demo-panel" data-demo-panel="dispatch" id="demo-panel-dispatch">
+    <h3 class="demo-panel-title">
+      <span data-l="en">Dispatcher board</span><span data-l="vi">Bảng điều phối</span>
+    </h3>
     <p style="max-width:68ch;color:var(--text-muted);margin-top:16px">
-      <span data-l="en">The Android app's result screen, rebuilt: pick a sample leaf, and it runs the same top-3-probability display the on-device model shows, using the real 39-class label set (38 crop/disease classes plus an explicit "Unknown" fallback) from the shipped model.</span>
-      <span data-l="vi">Bản dựng lại màn hình kết quả của ứng dụng Android: chọn một mẫu lá, xem hiển thị top-3 xác suất giống hệt mô hình trên thiết bị — dùng đúng bộ 39 nhãn (38 nhóm cây/bệnh cộng nhãn "Unknown") từ mô hình đã triển khai.</span>
+      <span data-l="en">A mini-rebuild of the dispatch dashboard's vehicle list and stop timeline — the part of the fleet platform a dispatcher actually lives in all day. Same execution states, same actions (advance, skip, cancel, revert, reorder) and the same stuck / GPS-stale attention flags as the production board, running on three sample assignments instead of the live 36-truck fleet. Pick a vehicle, expand a stop, work the timeline.</span>
+      <span data-l="vi">Bản dựng lại thu nhỏ của bảng điều phối — phần dispatcher viên dùng cả ngày trong nền tảng điều vận. Cùng các trạng thái thực thi, cùng các thao tác (xác nhận tiếp, bỏ qua, hủy, hoàn tác, đổi thứ tự) và cùng cờ cảnh báo kẹt xe / GPS cũ như bảng thật — chạy trên ba chuyến mẫu thay vì đội xe 36 chiếc thật. Chọn một xe, mở rộng một điểm dừng, thao tác trên timeline.</span>
     </p>
-    <div class="agrilens-wrap">
-      <div class="agrilens-samples" id="agrilens-samples"></div>
-      <div class="agrilens-phone">
-        <div class="agrilens-screen">
-          <div class="agrilens-leafview" id="agrilens-leafview"></div>
-          <div class="agrilens-status" id="agrilens-status">
-            <span data-l="en">Pick a sample leaf</span><span data-l="vi">Chọn một mẫu lá</span>
+
+    <div class="dispatch-attn-strip" id="dispatch-attn-strip"></div>
+
+    <div class="dispatch-wrap">
+      <div class="dispatch-vehicles" id="dispatch-vehicles"></div>
+      <div class="dispatch-timeline">
+        <div class="dispatch-timeline-head">
+          <div>
+            <div class="dispatch-timeline-plate" id="dispatch-plate"></div>
+            <div class="dispatch-timeline-driver" id="dispatch-driver"></div>
           </div>
-          <div class="agrilens-results" id="agrilens-results" hidden></div>
+          <button class="btn btn-secondary" id="dispatch-revert-btn" onclick="dispatchRevert()" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+            <span data-l="en">Revert last action</span><span data-l="vi">Hoàn tác gần nhất</span>
+          </button>
         </div>
+        <div class="dispatch-current" id="dispatch-current"></div>
+        <div class="dispatch-stop-list" id="dispatch-stops"></div>
       </div>
     </div>
   </div>
@@ -1555,6 +1604,7 @@ function setLang(v) {
   document.documentElement.dataset.lang = v;
   document.documentElement.lang = v === 'vi' ? 'vi' : 'en';
   localStorage.setItem('khoa.lang', v);
+  if (window.dispatchRenderAll) dispatchRenderAll();
 }
 
 /* ─── THEME ──────────────────────────────────────────────────────────────── */
@@ -2101,132 +2151,327 @@ const demoIO = new IntersectionObserver(entries => {
 }, { threshold: [0, 0.25, 0.6] });
 document.querySelectorAll('.demo-panel').forEach(p => demoIO.observe(p));
 
-/* ─── AGRILENS DEMO — same 39-class label set as agrilens/assets/labels.txt ── */
-function agrilensFormatLabel(raw) {
-  const parts = raw.split('___');
-  if (parts.length < 2) return raw.replace(/_/g, ' ');
-  return parts[0].replace(/_/g, ' ') + ' — ' + parts[1].replace(/_/g, ' ').trim();
-}
+/* ─── DISPATCHER BOARD DEMO — same execution states, actions (advance/skip/
+   cancel/revert/reorder) and stuck/GPS-stale attention thresholds as
+   services/delivery/ and static/js/dashboard/ in the real fleet platform
+   (github.com/KhoaNguyen01004/ThanhTrungApp), running on three sample
+   assignments instead of the live board. ─────────────────────────────────── */
+const DISPATCH_STUCK_MS = 20 * 60000;
+const DISPATCH_GPS_STALE_MS = 15 * 60000;
+const DISPATCH_TERMINAL = ['completed', 'skipped', 'cancelled'];
 
-const AGRILENS_SAMPLES = [
+const DISPATCH_STATUS_LABEL = {
+  planned:   { en: 'Planned',   vi: 'Chưa tới' },
+  arrived:   { en: 'Arrived',   vi: 'Đã đến' },
+  executing: { en: 'En route',  vi: 'Đang chạy' },
+  completed: { en: 'Completed', vi: 'Hoàn tất' },
+  skipped:   { en: 'Skipped',   vi: 'Đã bỏ qua' },
+  cancelled: { en: 'Cancelled', vi: 'Đã hủy' },
+};
+
+const DISPATCH_VEHICLES = [
   {
-    id: 'apple-scab', nameEn: 'Apple leaf', nameVi: 'Lá táo', color: '#8a9b52', spotColor: '#6b5a2e',
-    top3: [
-      { label: 'Apple___Apple_scab', prob: 0.94 },
-      { label: 'Apple___Black_rot', prob: 0.04 },
-      { label: 'Apple___Cedar_apple_rust', prob: 0.01 },
+    id: 'v1', plate: '51C-236.36', driver: 'Nguyễn Văn Long',
+    planEn: 'Route 36 — District 7 morning loop', planVi: 'Tuyến 36 — Quận 7 buổi sáng',
+    gpsAgoMin: 2,
+    stops: [
+      { id: 'v1s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed' },
+      { id: 'v1s2', seq: 2, nameEn: 'Co.opmart — Nguyễn Thị Thập', nameVi: 'Co.opmart — Nguyễn Thị Thập', addressEn: '171 Nguyễn Thị Thập, Q7', addressVi: '171 Nguyễn Thị Thập, Q7', manager: 'Lê Thu Hà', phone: '090 552 7761', status: 'completed' },
+      { id: 'v1s3', seq: 3, nameEn: 'Bách Hóa Xanh — Lê Văn Lương', nameVi: 'Bách Hóa Xanh — Lê Văn Lương', addressEn: '452 Lê Văn Lương, Q7', addressVi: '452 Lê Văn Lương, Q7', manager: 'Trịnh Anh Tuấn', phone: '090 118 3390', status: 'arrived', arrivedAgoMin: 4 },
+      { id: 'v1s4', seq: 4, nameEn: 'Phú Mỹ Hưng convenience store', nameVi: 'Cửa hàng tiện lợi Phú Mỹ Hưng', addressEn: 'Hưng Vượng, Q7', addressVi: 'Hưng Vượng, Q7', manager: 'Đỗ Ngọc Mai', phone: '090 664 2015', status: 'planned', etaMin: 26 },
+      { id: 'v1s5', seq: 5, nameEn: 'Tân Thuận cold storage', nameVi: 'Kho lạnh Tân Thuận', addressEn: 'KCX Tân Thuận, Q7', addressVi: 'KCX Tân Thuận, Q7', manager: 'Vũ Đình Khang', phone: '090 887 5529', status: 'planned', etaMin: 52 },
     ],
-    careEn: 'Remove and destroy fallen leaves over winter; apply a protectant fungicide at green tip and repeat on a 7–10 day schedule through wet spring weather.',
-    careVi: 'Dọn và tiêu hủy lá rụng vào mùa đông; phun thuốc trừ nấm bảo vệ lúc chồi xanh và lặp lại mỗi 7–10 ngày trong mùa xuân ẩm.',
   },
   {
-    id: 'tomato-blight', nameEn: 'Tomato leaf', nameVi: 'Lá cà chua', color: '#5c7a3f', spotColor: '#2e2018',
-    top3: [
-      { label: 'Tomato___Late_blight', prob: 0.91 },
-      { label: 'Tomato___Early_blight', prob: 0.06 },
-      { label: 'Tomato___Target_Spot', prob: 0.02 },
+    id: 'v2', plate: '51C-118.02', driver: 'Trần Minh Tuấn',
+    planEn: 'Route 18 — Nhà Bè afternoon loop', planVi: 'Tuyến 18 — Nhà Bè buổi chiều',
+    gpsAgoMin: 1,
+    stops: [
+      { id: 'v2s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed' },
+      { id: 'v2s2', seq: 2, nameEn: 'Bình Điền wholesale market', nameVi: 'Chợ đầu mối Bình Điền', addressEn: 'QL50, Bình Điền', addressVi: 'QL50, Bình Điền', manager: 'Ngô Thanh Sơn', phone: '090 220 8817', status: 'arrived', arrivedAgoMin: 44 },
+      { id: 'v2s3', seq: 3, nameEn: 'Big C — Nhà Bè', nameVi: 'Siêu thị Big C Nhà Bè', addressEn: 'TL15, Nhà Bè', addressVi: 'TL15, Nhà Bè', manager: 'Huỳnh Gia Bảo', phone: '090 774 3361', status: 'planned', etaMin: 30 },
+      { id: 'v2s4', seq: 4, nameEn: 'Partner school — office-supplies drop', nameVi: 'Trường học liên kết — giao văn phòng phẩm', addressEn: 'Nhơn Đức, Nhà Bè', addressVi: 'Nhơn Đức, Nhà Bè', manager: 'Cô Hồng Nhung', phone: '090 405 9928', status: 'planned', etaMin: 58 },
     ],
-    careEn: 'Remove infected foliage immediately, improve airflow between plants, avoid overhead watering, and apply a copper-based fungicide before the next rain.',
-    careVi: 'Cắt bỏ lá bệnh ngay, tăng thông thoáng giữa các cây, tránh tưới lên lá, và phun thuốc gốc đồng trước đợt mưa tiếp theo.',
   },
   {
-    id: 'corn-rust', nameEn: 'Corn leaf', nameVi: 'Lá bắp', color: '#7a8f4a', spotColor: '#b3672c',
-    top3: [
-      { label: 'Corn_(maize)___Common_rust_', prob: 0.88 },
-      { label: 'Corn_(maize)___Northern_Leaf_Blight', prob: 0.07 },
-      { label: 'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot', prob: 0.03 },
+    id: 'v3', plate: '51C-097.14', driver: 'Trần Thị Mai',
+    planEn: 'Route 97 — District 8 morning loop', planVi: 'Tuyến 97 — Quận 8 buổi sáng',
+    gpsAgoMin: 33,
+    stops: [
+      { id: 'v3s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed' },
+      { id: 'v3s2', seq: 2, nameEn: 'An Lạc building-materials store', nameVi: 'Cửa hàng Vật liệu Xây dựng An Lạc', addressEn: 'An Lạc, Bình Tân', addressVi: 'An Lạc, Bình Tân', manager: 'Bùi Xuân Hòa', phone: '090 331 6674', status: 'skipped', reasonEn: 'Store closed for renovation', reasonVi: 'Cửa hàng đóng cửa sửa chữa' },
+      { id: 'v3s3', seq: 3, nameEn: 'Bách Hóa Xanh — Phạm Thế Hiển', nameVi: 'Bách Hóa Xanh — Phạm Thế Hiển', addressEn: '210 Phạm Thế Hiển, Q8', addressVi: '210 Phạm Thế Hiển, Q8', manager: 'Lý Thành Đạt', phone: '090 992 1147', status: 'arrived', arrivedAgoMin: 5 },
+      { id: 'v3s4', seq: 4, nameEn: 'District 8 distribution depot', nameVi: 'Kho phân phối Quận 8', addressEn: 'Phạm Hùng, Q8', addressVi: 'Phạm Hùng, Q8', manager: 'Đặng Việt Cường', phone: '090 556 8203', status: 'planned', etaMin: 20 },
     ],
-    careEn: 'Usually minor on mature plants — monitor weekly; apply a foliar fungicide only if rust develops before tasseling on a susceptible hybrid.',
-    careVi: 'Thường nhẹ trên cây trưởng thành — theo dõi hàng tuần; chỉ phun thuốc nếu bệnh gỉ sắt xuất hiện trước khi trổ cờ trên giống mẫn cảm.',
-  },
-  {
-    id: 'potato-healthy', nameEn: 'Potato leaf', nameVi: 'Lá khoai tây', color: '#4f8a4f', spotColor: null,
-    top3: [
-      { label: 'Potato___healthy', prob: 0.97 },
-      { label: 'Potato___Early_blight', prob: 0.02 },
-      { label: 'Potato___Late_blight', prob: 0.01 },
-    ],
-    careEn: 'No signs of disease — maintain routine watering and keep monitoring weekly during humid weather.',
-    careVi: 'Không có dấu hiệu bệnh — duy trì tưới nước định kỳ và tiếp tục theo dõi hàng tuần trong thời tiết ẩm.',
-  },
-  {
-    id: 'unknown', nameEn: 'Unclear photo', nameVi: 'Ảnh không rõ', color: '#6b6660', spotColor: null, isUnknown: true,
-    top3: [
-      { label: 'Unknown', prob: 0.81 },
-      { label: 'Tomato___healthy', prob: 0.09 },
-      { label: 'Grape___healthy', prob: 0.05 },
-    ],
-    careEn: "The model isn't confident this is one of its 38 known crops — try a closer, well-lit photo of a single leaf.",
-    careVi: 'Mô hình không đủ tin cậy đây là một trong 38 loại cây đã biết — hãy thử chụp gần, đủ sáng, một lá duy nhất.',
   },
 ];
 
-function agrilensLeafSVG(sample) {
-  const spots = sample.spotColor ? `
-    <ellipse cx="52" cy="40" rx="7" ry="5" fill="${sample.spotColor}" opacity="0.75"/>
-    <ellipse cx="34" cy="58" rx="5" ry="4" fill="${sample.spotColor}" opacity="0.7"/>
-    <ellipse cx="62" cy="66" rx="6" ry="4" fill="${sample.spotColor}" opacity="0.7"/>
-    <ellipse cx="44" cy="80" rx="4" ry="3" fill="${sample.spotColor}" opacity="0.65"/>` : '';
-  return `<svg width="72" height="90" viewBox="0 0 88 110">
-    <path d="M44 6 C 78 24, 80 70, 44 104 C 8 70, 10 24, 44 6 Z" fill="${sample.color}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
-    <path d="M44 10 L44 100" stroke="rgba(0,0,0,.2)" stroke-width="1.5" fill="none"/>
-    ${spots}
-  </svg>`;
+let _dispatchSelected = 'v1';
+const _dispatchOpenOverride = new Map();
+
+function dispatchLang() { return document.documentElement.dataset.lang === 'vi' ? 'vi' : 'en'; }
+
+function dispatchFmtAgo(ms) {
+  const min = Math.max(0, Math.round((Date.now() - ms) / 60000));
+  const vi = dispatchLang() === 'vi';
+  if (min < 1) return vi ? 'vừa xong' : 'just now';
+  if (min < 60) return vi ? `${min} phút trước` : `${min}m ago`;
+  const h = Math.floor(min / 60), m = min % 60;
+  return vi ? `${h} giờ ${m} phút trước` : `${h}h ${m}m ago`;
 }
-function agrilensUnknownSVG() {
-  return `<svg width="72" height="90" viewBox="0 0 88 110">
-    <rect x="14" y="20" width="60" height="72" rx="6" fill="#4a4540" stroke="rgba(0,0,0,.3)" stroke-width="1.5"/>
-    <circle cx="44" cy="50" r="14" fill="none" stroke="#8a847c" stroke-width="3"/>
-    <text x="44" y="58" font-size="18" fill="#8a847c" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="900">?</text>
-  </svg>`;
+function dispatchFmtClock(ms) {
+  const d = new Date(ms);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+function dispatchStatusBadge(status) {
+  return `<span class="dispatch-badge st-${status}">${DISPATCH_STATUS_LABEL[status][dispatchLang()]}</span>`;
+}
+function dispatchFlagLabel(f) {
+  const vi = dispatchLang() === 'vi';
+  const min = Math.round(f.ageMs / 60000);
+  if (f.type === 'stuck') return vi ? `Kẹt tại điểm ${min}ph` : `Stuck ${min}m`;
+  return vi ? `GPS cũ ${min}ph` : `GPS stale ${min}m`;
+}
+function dispatchAttentionFlags(v) {
+  const flags = [];
+  const gpsAgeMs = Date.now() - v.gpsAt;
+  if (gpsAgeMs > DISPATCH_GPS_STALE_MS) {
+    flags.push({ type: 'gpsStale', severity: gpsAgeMs > DISPATCH_GPS_STALE_MS * 2 ? 'critical' : 'warn', ageMs: gpsAgeMs });
+  }
+  const current = v.stops.find(s => s.status === 'arrived');
+  if (current) {
+    const stuckMs = Date.now() - current.arrivedAt;
+    if (stuckMs > DISPATCH_STUCK_MS) {
+      flags.push({ type: 'stuck', severity: stuckMs > DISPATCH_STUCK_MS * 2 ? 'critical' : 'warn', ageMs: stuckMs });
+    }
+  }
+  return flags;
+}
+function dispatchOverallStatus(v) {
+  if (v.stops.every(s => DISPATCH_TERMINAL.includes(s.status))) return 'completed';
+  if (v.stops.some(s => s.status === 'arrived')) return 'arrived';
+  if (v.stops.some(s => DISPATCH_TERMINAL.includes(s.status))) return 'executing';
+  return 'planned';
+}
+function dispatchProgress(v) {
+  const done = v.stops.filter(s => DISPATCH_TERMINAL.includes(s.status)).length;
+  return { done, total: v.stops.length, pct: Math.round((done / v.stops.length) * 100) };
+}
+function dispatchSortedStops(v) { return [...v.stops].sort((a, b) => a.seq - b.seq); }
+function dispatchIsOpen(s) {
+  if (_dispatchOpenOverride.has(s.id)) return _dispatchOpenOverride.get(s.id);
+  return !DISPATCH_TERMINAL.includes(s.status);
 }
 
-let _agrilensBusy = false;
-function initAgrilensDemo() {
-  const row = document.getElementById('agrilens-samples');
-  if (!row) return;
-  row.innerHTML = AGRILENS_SAMPLES.map(s => `
-    <button class="agrilens-sample" data-sample="${s.id}" onclick="agrilensPick('${s.id}')">
-      <span class="agrilens-sample-icon">${s.isUnknown ? agrilensUnknownSVG() : agrilensLeafSVG(s)}</span>
-      <span class="agrilens-sample-name"><span data-l="en">${s.nameEn}</span><span data-l="vi">${s.nameVi}</span></span>
+function dispatchRenderAttnStrip() {
+  const el = document.getElementById('dispatch-attn-strip');
+  if (!el) return;
+  const flagged = DISPATCH_VEHICLES.map(v => ({ v, flags: dispatchAttentionFlags(v) })).filter(x => x.flags.length);
+  flagged.sort((a, b) => (b.flags.some(f => f.severity === 'critical') ? 1 : 0) - (a.flags.some(f => f.severity === 'critical') ? 1 : 0));
+  el.innerHTML = flagged.map(({ v, flags }) => `
+    <button class="dispatch-attn-chip${flags.some(f => f.severity === 'critical') ? ' critical' : ''}" onclick="dispatchSelectVehicle('${v.id}')">
+      <span class="dispatch-attn-dot"></span>${v.plate} — ${flags.map(dispatchFlagLabel).join(', ')}
     </button>`).join('');
 }
 
-window.agrilensPick = function(id) {
-  if (_agrilensBusy) return;
-  const sample = AGRILENS_SAMPLES.find(s => s.id === id);
-  if (!sample) return;
-  _agrilensBusy = true;
-  document.querySelectorAll('.agrilens-sample').forEach(el => el.classList.toggle('on', el.dataset.sample === id));
+function dispatchRenderVehicles() {
+  const wrap = document.getElementById('dispatch-vehicles');
+  if (!wrap) return;
+  const lang = dispatchLang();
+  wrap.innerHTML = DISPATCH_VEHICLES.map(v => {
+    const overall = dispatchOverallStatus(v);
+    const prog = dispatchProgress(v);
+    const cur = dispatchSortedStops(v).find(s => !DISPATCH_TERMINAL.includes(s.status));
+    const flags = dispatchAttentionFlags(v);
+    return `
+    <button class="dispatch-vehicle${v.id === _dispatchSelected ? ' on' : ''}" data-vehicle="${v.id}" onclick="dispatchSelectVehicle('${v.id}')">
+      <div class="dispatch-vehicle-top">
+        <span class="dispatch-vehicle-plate">${v.plate}</span>
+        ${dispatchStatusBadge(overall)}
+      </div>
+      <div class="dispatch-vehicle-driver">${v.driver}</div>
+      <div class="dispatch-vehicle-stop">${cur ? (lang === 'vi' ? cur.nameVi : cur.nameEn) : (lang === 'vi' ? 'Đã hoàn tất mọi điểm' : 'All stops complete')}</div>
+      <div class="dispatch-progress-track"><div class="dispatch-progress-fill" style="width:${prog.pct}%"></div></div>
+      <div class="dispatch-vehicle-meta">
+        <span>${prog.done}/${prog.total} ${lang === 'vi' ? 'điểm' : 'stops'}</span>
+        <span>GPS ${dispatchFmtAgo(v.gpsAt)}</span>
+      </div>
+      ${flags.length ? `<div class="dispatch-vehicle-flags">${flags.map(f => `<span class="dispatch-badge" style="border-color:var(--accent);color:var(--accent)">${dispatchFlagLabel(f)}</span>`).join('')}</div>` : ''}
+    </button>`;
+  }).join('');
+}
 
-  const leafview = document.getElementById('agrilens-leafview');
-  const status = document.getElementById('agrilens-status');
-  const results = document.getElementById('agrilens-results');
-  leafview.innerHTML = sample.isUnknown ? agrilensUnknownSVG() : agrilensLeafSVG(sample);
-  results.hidden = true;
-  status.hidden = false;
-  status.innerHTML = '<span data-l="en">Analyzing on-device…</span><span data-l="vi">Đang phân tích trên thiết bị…</span>';
+function dispatchStopRowHtml(v, s, idx, sorted) {
+  const lang = dispatchLang();
+  const open = dispatchIsOpen(s);
+  const prev = sorted[idx - 1], next = sorted[idx + 1];
+  const canMoveUp = s.status === 'planned' && prev && prev.status === 'planned';
+  const canMoveDown = s.status === 'planned' && next && next.status === 'planned';
 
-  setTimeout(() => {
-    const lang = document.documentElement.dataset.lang === 'vi' ? 'vi' : 'en';
-    status.hidden = true;
-    results.hidden = false;
-    const top = sample.top3[0];
-    results.innerHTML = `
-      <div class="agrilens-top-label">${agrilensFormatLabel(top.label)}</div>
-      <div class="agrilens-top-conf">${Math.round(top.prob * 100)}% ${lang === 'vi' ? 'độ tin cậy' : 'confidence'}</div>
-      ${sample.top3.map(t => `
-        <div class="agrilens-bar-row">
-          <div class="agrilens-bar-head"><span>${agrilensFormatLabel(t.label)}</span><span>${Math.round(t.prob * 100)}%</span></div>
-          <div class="agrilens-bar-track"><div class="agrilens-bar-fill" style="width:${Math.round(t.prob * 100)}%"></div></div>
-        </div>`).join('')}
-      <div class="agrilens-care"><b>${lang === 'vi' ? 'Hướng dẫn chăm sóc' : 'Care guidance'}:</b> ${lang === 'vi' ? sample.careVi : sample.careEn}</div>
-    `;
-    _agrilensBusy = false;
-  }, 650);
+  const actions = [];
+  if (s.status === 'planned') {
+    actions.push(`<button class="btn btn-primary" onclick="event.stopPropagation();dispatchAdvance('${v.id}','${s.id}')"><span data-l="en">Advance</span><span data-l="vi">Xác nhận đến</span></button>`);
+    actions.push(`<button class="btn btn-secondary" onclick="event.stopPropagation();dispatchSkip('${v.id}','${s.id}')"><span data-l="en">Skip</span><span data-l="vi">Bỏ qua</span></button>`);
+    actions.push(`<button class="btn btn-secondary" onclick="event.stopPropagation();dispatchCancel('${v.id}','${s.id}')"><span data-l="en">Cancel</span><span data-l="vi">Hủy</span></button>`);
+  } else if (s.status === 'arrived') {
+    actions.push(`<button class="btn btn-primary" onclick="event.stopPropagation();dispatchAdvance('${v.id}','${s.id}')"><span data-l="en">Complete</span><span data-l="vi">Hoàn tất</span></button>`);
+    actions.push(`<button class="btn btn-secondary" onclick="event.stopPropagation();dispatchCancel('${v.id}','${s.id}')"><span data-l="en">Cancel</span><span data-l="vi">Hủy</span></button>`);
+  }
+
+  const detail = [
+    `<div><b>${lang === 'vi' ? 'Địa chỉ' : 'Address'}:</b> ${lang === 'vi' ? s.addressVi : s.addressEn}</div>`,
+    `<div><b>${lang === 'vi' ? 'Phụ trách' : 'Manager'}:</b> ${s.manager} · ${s.phone}</div>`,
+  ];
+  if (s.status === 'planned') detail.push(`<div><b>ETA:</b> ${dispatchFmtClock(s.etaAt)}</div>`);
+  if (s.status === 'arrived') detail.push(`<div><b>${lang === 'vi' ? 'Đến lúc' : 'Arrived'}:</b> ${dispatchFmtClock(s.arrivedAt)} (${dispatchFmtAgo(s.arrivedAt)})</div>`);
+  if (s.status === 'completed' && s.completedAt) detail.push(`<div><b>${lang === 'vi' ? 'Hoàn tất lúc' : 'Completed'}:</b> ${dispatchFmtClock(s.completedAt)}</div>`);
+  const reason = s.reasonEn ? `<div class="dispatch-stop-reason">${lang === 'vi' ? 'Lý do' : 'Reason'}: ${lang === 'vi' ? s.reasonVi : s.reasonEn}</div>` : '';
+
+  return `
+  <div class="dispatch-stop${open ? ' open' : ''}" data-stop="${s.id}">
+    <div class="dispatch-stop-head" onclick="dispatchToggleStop('${s.id}')">
+      <span class="dispatch-stop-seq">${s.seq}</span>
+      <span class="dispatch-stop-name">${lang === 'vi' ? s.nameVi : s.nameEn}</span>
+      ${dispatchStatusBadge(s.status)}
+      <span class="dispatch-move-btns">
+        <button class="dispatch-move-btn" ${canMoveUp ? '' : 'disabled'} onclick="event.stopPropagation();dispatchMove('${v.id}','${s.id}',-1)" aria-label="Move up">▲</button>
+        <button class="dispatch-move-btn" ${canMoveDown ? '' : 'disabled'} onclick="event.stopPropagation();dispatchMove('${v.id}','${s.id}',1)" aria-label="Move down">▼</button>
+      </span>
+      <span class="dispatch-stop-chevron">▾</span>
+    </div>
+    <div class="dispatch-stop-body" ${open ? '' : 'hidden'}>
+      <div class="dispatch-stop-detail">${detail.join('')}</div>
+      ${reason}
+      ${actions.length ? `<div class="dispatch-stop-actions">${actions.join('')}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function dispatchRenderTimeline() {
+  const v = DISPATCH_VEHICLES.find(x => x.id === _dispatchSelected);
+  if (!v) return;
+  const lang = dispatchLang();
+  document.getElementById('dispatch-plate').textContent = v.plate;
+  document.getElementById('dispatch-driver').textContent = `${v.driver} — ${lang === 'vi' ? v.planVi : v.planEn}`;
+  document.getElementById('dispatch-revert-btn').disabled = !v.lastAction;
+
+  const sorted = dispatchSortedStops(v);
+  const cur = sorted.find(s => !DISPATCH_TERMINAL.includes(s.status));
+  const curEl = document.getElementById('dispatch-current');
+  if (!cur) {
+    curEl.style.cursor = 'default';
+    curEl.onclick = null;
+    curEl.innerHTML = `
+      <div class="dispatch-current-label">${lang === 'vi' ? 'ĐIỂM HIỆN TẠI' : 'CURRENT STOP'}</div>
+      <div class="dispatch-current-name">${lang === 'vi' ? 'Đã hoàn tất mọi điểm dừng' : 'All stops complete'}</div>`;
+  } else {
+    curEl.style.cursor = 'pointer';
+    curEl.onclick = () => dispatchToggleStop(cur.id);
+    curEl.innerHTML = `
+      <div class="dispatch-current-label">${lang === 'vi' ? 'ĐIỂM HIỆN TẠI' : 'CURRENT STOP'}</div>
+      <div class="dispatch-current-name">#${cur.seq} ${lang === 'vi' ? cur.nameVi : cur.nameEn} ${dispatchStatusBadge(cur.status)}</div>
+      <div class="dispatch-current-addr">${lang === 'vi' ? cur.addressVi : cur.addressEn}</div>
+      <div class="dispatch-current-row">
+        <span>${cur.manager}</span>
+        <span>${cur.phone}</span>
+        <span>${cur.status === 'planned' ? 'ETA ' + dispatchFmtClock(cur.etaAt) : (lang === 'vi' ? 'đến lúc ' : 'arrived ') + dispatchFmtAgo(cur.arrivedAt)}</span>
+      </div>`;
+  }
+
+  document.getElementById('dispatch-stops').innerHTML = sorted.map((s, i) => dispatchStopRowHtml(v, s, i, sorted)).join('');
+}
+
+function dispatchRenderAll() {
+  dispatchRenderAttnStrip();
+  dispatchRenderVehicles();
+  dispatchRenderTimeline();
+}
+
+window.dispatchSelectVehicle = function(id) {
+  _dispatchSelected = id;
+  dispatchRenderAll();
+};
+window.dispatchToggleStop = function(id) {
+  const v = DISPATCH_VEHICLES.find(x => x.id === _dispatchSelected);
+  const s = v && v.stops.find(x => x.id === id);
+  if (!s) return;
+  _dispatchOpenOverride.set(id, !dispatchIsOpen(s));
+  dispatchRenderTimeline();
+};
+window.dispatchAdvance = function(vid, sid) {
+  const v = DISPATCH_VEHICLES.find(x => x.id === vid);
+  const s = v && v.stops.find(x => x.id === sid);
+  if (!s) return;
+  const snapshot = { ...s };
+  if (s.status === 'planned') { s.status = 'arrived'; s.arrivedAt = Date.now(); }
+  else if (s.status === 'arrived') { s.status = 'completed'; s.completedAt = Date.now(); }
+  else return;
+  v.lastAction = { stopId: sid, snapshot };
+  dispatchRenderAll();
+};
+window.dispatchSkip = function(vid, sid) {
+  const v = DISPATCH_VEHICLES.find(x => x.id === vid);
+  const s = v && v.stops.find(x => x.id === sid);
+  if (!s || s.status !== 'planned') return;
+  const lang = dispatchLang();
+  const input = window.prompt(lang === 'vi' ? 'Lý do bỏ qua (không bắt buộc):' : 'Reason for skipping (optional):', '');
+  if (input === null) return;
+  const snapshot = { ...s };
+  const reason = input.trim() || (lang === 'vi' ? 'Không có lý do' : 'No reason given');
+  s.status = 'skipped'; s.reasonEn = reason; s.reasonVi = reason;
+  v.lastAction = { stopId: sid, snapshot };
+  dispatchRenderAll();
+};
+window.dispatchCancel = function(vid, sid) {
+  const v = DISPATCH_VEHICLES.find(x => x.id === vid);
+  const s = v && v.stops.find(x => x.id === sid);
+  if (!s || DISPATCH_TERMINAL.includes(s.status)) return;
+  const lang = dispatchLang();
+  const input = window.prompt(lang === 'vi' ? 'Nhập lý do hủy (bắt buộc):' : 'Enter a reason to cancel (required):', '');
+  if (input === null) return;
+  const reason = input.trim();
+  if (!reason) { window.alert(lang === 'vi' ? 'Cần nhập lý do để hủy điểm dừng.' : 'A reason is required to cancel a stop.'); return; }
+  const snapshot = { ...s };
+  s.status = 'cancelled'; s.reasonEn = reason; s.reasonVi = reason;
+  v.lastAction = { stopId: sid, snapshot };
+  dispatchRenderAll();
+};
+window.dispatchRevert = function() {
+  const v = DISPATCH_VEHICLES.find(x => x.id === _dispatchSelected);
+  if (!v || !v.lastAction) return;
+  const s = v.stops.find(x => x.id === v.lastAction.stopId);
+  if (s) Object.assign(s, v.lastAction.snapshot);
+  v.lastAction = null;
+  dispatchRenderAll();
+};
+window.dispatchMove = function(vid, sid, dir) {
+  const v = DISPATCH_VEHICLES.find(x => x.id === vid);
+  if (!v) return;
+  const sorted = dispatchSortedStops(v);
+  const idx = sorted.findIndex(s => s.id === sid);
+  const other = sorted[idx + dir];
+  if (idx < 0 || !other) return;
+  const s = sorted[idx];
+  if (s.status !== 'planned' || other.status !== 'planned') return;
+  const tmp = s.seq; s.seq = other.seq; other.seq = tmp;
+  dispatchRenderAll();
 };
 
-initAgrilensDemo();
+function initDispatchDemo() {
+  if (!document.getElementById('dispatch-vehicles')) return;
+  const now = Date.now();
+  DISPATCH_VEHICLES.forEach(v => {
+    v.gpsAt = now - v.gpsAgoMin * 60000;
+    v.lastAction = null;
+    v.stops.forEach(s => {
+      if (s.status === 'arrived' && s.arrivedAgoMin != null) s.arrivedAt = now - s.arrivedAgoMin * 60000;
+      if (s.status === 'planned' && s.etaMin != null) s.etaAt = now + s.etaMin * 60000;
+    });
+  });
+  dispatchRenderAll();
+  setInterval(dispatchRenderAll, 15000);
+}
+initDispatchDemo();
 
 /* ─── ROBOTIC ARM DEMO — same joint order/limits/HOME/sort sequence as the
    FastAPI backend's simulation mode ─────────────────────────────────────── */
