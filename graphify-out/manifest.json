@@ -1,0 +1,72 @@
+{
+  "404.html": {
+    "mtime": 1788023249.7689626,
+    "ast_hash": "eeba2139206512eb2288a9f3bf6dd300",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1788023252.211967,
+    "ast_hash": "53f6f65ea63e6709435dbe81dfeb05b1",
+    "semantic_hash": ""
+  },
+  "images/README.md": {
+    "mtime": 1787986320.1239905,
+    "ast_hash": "c844fc461142ae87ed0361b7c0a98ebc",
+    "semantic_hash": ""
+  },
+  "index.html": {
+    "mtime": 1789052808.4493506,
+    "ast_hash": "29ffc21829da1c180119bf5f985dc967",
+    "semantic_hash": ""
+  },
+  "robots.txt": {
+    "mtime": 1788023252.7124586,
+    "ast_hash": "27b5ada815d3913023b2b42f3bb84230",
+    "semantic_hash": ""
+  },
+  "uploads/NguyenVietAnhKhoaRESUME_EN.pdf": {
+    "mtime": 1788023992.2451959,
+    "ast_hash": "b7abd9526ca61764c8f530a273903838",
+    "semantic_hash": ""
+  },
+  "uploads/NguyenVietAnhKhoaRESUME_VIE.pdf": {
+    "mtime": 1788023959.9336324,
+    "ast_hash": "2ae6fd26ba5953b08a3daeca4bef9b29",
+    "semantic_hash": ""
+  },
+  "apple-touch-icon.png": {
+    "mtime": 1788023250.855751,
+    "ast_hash": "485c6cde36ab7b5710e43748e5d373a7",
+    "semantic_hash": ""
+  },
+  "favicon.svg": {
+    "mtime": 1788023250.3502903,
+    "ast_hash": "6391d7d3c41444d3e21b747be6e3f185",
+    "semantic_hash": ""
+  },
+  "images/og-cover.png": {
+    "mtime": 1788023251.6590278,
+    "ast_hash": "606b1672363bc5737203e36be4de4131",
+    "semantic_hash": ""
+  },
+  "images/portrait.webp": {
+    "mtime": 1787986285.5194733,
+    "ast_hash": "cc0d3bee4639cb4f81523e1750bed27b",
+    "semantic_hash": ""
+  },
+  "images/project-agrilens.jpg": {
+    "mtime": 1788022135.5286148,
+    "ast_hash": "b9b201699a5cd2d540494a10692b5cee",
+    "semantic_hash": ""
+  },
+  "images/project-fleet.jpg": {
+    "mtime": 1789052646.1040516,
+    "ast_hash": "b32b56c323e843123c7692731e2a0766",
+    "semantic_hash": ""
+  },
+  "images/project-robot.jpg": {
+    "mtime": 1788022041.0780923,
+    "ast_hash": "e292168363ff33609dfb6486cfaa3c5f",
+    "semantic_hash": ""
+  }
+}

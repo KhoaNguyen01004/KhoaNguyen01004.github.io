@@ -1,0 +1,165 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme",
+      "community": 0,
+      "community_name": "khoanguyen01004.github.io",
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "khoanguyen01004.github.io",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme_khoanguyen01004_github_io",
+      "community": 0,
+      "community_name": "khoanguyen01004.github.io",
+      "norm_label": "khoanguyen01004.github.io"
+    },
+    {
+      "label": "Layout",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "readme_layout",
+      "community": 0,
+      "community_name": "khoanguyen01004.github.io",
+      "norm_label": "layout"
+    },
+    {
+      "label": "Demos",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "readme_demos",
+      "community": 0,
+      "community_name": "khoanguyen01004.github.io",
+      "norm_label": "demos"
+    },
+    {
+      "label": "Running it locally",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "readme_running_it_locally",
+      "community": 0,
+      "community_name": "khoanguyen01004.github.io",
+      "norm_label": "running it locally"
+    },
+    {
+      "label": "Deploying",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "readme_deploying",
+      "community": 0,
+      "community_name": "khoanguyen01004.github.io",
+      "norm_label": "deploying"
+    },
+    {
+      "label": "images/README.md",
+      "file_type": "document",
+      "source_file": "images/README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "images_readme",
+      "community": 1,
+      "community_name": "images/README.md",
+      "norm_label": "images/readme.md"
+    },
+    {
+      "label": "Images",
+      "file_type": "document",
+      "source_file": "images/README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "images_readme_images",
+      "community": 1,
+      "community_name": "images/README.md",
+      "norm_label": "images"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_khoanguyen01004_github_io",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_khoanguyen01004_github_io",
+      "target": "readme_demos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_khoanguyen01004_github_io",
+      "target": "readme_deploying",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_khoanguyen01004_github_io",
+      "target": "readme_layout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_khoanguyen01004_github_io",
+      "target": "readme_running_it_locally",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "images/README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "images_readme",
+      "target": "images_readme_images",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "7dea23aaf3a436a2b70870c19a6688829290890d"
+}

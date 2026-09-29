@@ -29,9 +29,10 @@
 <meta name="twitter:description" content="A Flask dispatch platform running a 36-truck fleet, on-device plant disease detection, and a FastAPI robot arm controller — with live in-browser demos of each.">
 <meta name="twitter:image" content="https://khoanguyen01004.github.io/images/og-cover.png">
 
+<script>document.documentElement.classList.add('js')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,700;0,800;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ─── RESET & ROOT ─────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -157,14 +158,22 @@ nav {
 /* ─── HERO ──────────────────────────────────────────────────────────────── */
 .hero {
   max-width: var(--max); margin: 0 auto;
-  padding: 64px var(--pad) 56px;
+  padding: 40px var(--pad) 48px;
+  min-height: calc(100svh - 64px);
+  display: flex; flex-direction: column; justify-content: center;
 }
 
+/* Copy wrapper dissolves so the giant name can take a full-width row above
+   the bio + portrait columns, never overlapping the photo */
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
-  gap: 40px; align-items: end;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto 1fr; /* portrait's extra height lands above the buttons, not between terminal and bio */
+  column-gap: 40px; align-items: end;
 }
+.hero-copy { display: contents; }
+.hero-copy > * { grid-column: 1; }
+.hero-eyebrow, .hero-copy > .hero-name-wrap { grid-column: 1 / -1; }
 
 .hero-eyebrow {
   font-size: 12px; font-weight: 800;
@@ -178,10 +187,10 @@ nav {
 }
 
 .hero-name {
-  font-size: clamp(44px, 8vw, 98px);
+  font-size: clamp(48px, 9.6vw, 144px);
   font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: .92;
+  letter-spacing: -0.045em;
 }
 
 /* ─── TERMINAL PROMPT & BLINKING CURSOR ─────────────────────────────────── */
@@ -227,7 +236,8 @@ nav {
 
 /* Portrait */
 .hero-portrait {
-  height: 420px; position: relative; min-width: 0;
+  grid-column: 2; grid-row: 3 / 6; align-self: stretch;
+  min-height: 340px; position: relative; min-width: 0;
   border: 1px solid var(--divider);
   background: var(--surface);
   overflow: hidden;
@@ -236,6 +246,32 @@ nav {
 .portrait-inner {
   width: 100%; height: 100%;
   display: block; object-fit: cover;
+  scale: 1.15; /* headroom so parallax never shows an edge */
+}
+
+/* ─── SCROLL FX: reveal, parallax, grain ────────────────────────────────── */
+.js .reveal {
+  opacity: 0; translate: 0 28px;
+  transition: opacity .8s ease, translate .8s cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+.js .reveal.in { opacity: 1; translate: 0 0; }
+[data-speed] { will-change: translate; }
+
+body::after {
+  content: ''; position: fixed; inset: -50%; z-index: 300;
+  pointer-events: none; opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain .8s steps(5) infinite;
+}
+@keyframes grain {
+  20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); }
+  60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal { opacity: 1; translate: none; transition: none; }
+  body::after { animation: none; }
 }
 
 /* ─── STATS ─────────────────────────────────────────────────────────────── */
@@ -349,99 +385,51 @@ nav {
 [data-filter="react"]      [data-proj]:not([data-tech~="react"])      { display: none !important; }
 [data-filter="javascript"] [data-proj]:not([data-tech~="javascript"]) { display: none !important; }
 
-/* ─── PROJECT CARDS ─────────────────────────────────────────────────────── */
-.projects-list { margin-top: 32px; }
-.projects-list-rule { height: 2px; background: var(--divider); }
-
-.project-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  gap: 32px; padding: 32px 0;
-  border-bottom: 1px solid var(--divider);
-  cursor: pointer;
-  transition: background .2s ease;
+/* ─── BOOKSHELF — spines drift right→left on a CSS loop (track holds two
+   identical halves, JS fills each half to at least the shelf's width).
+   Page scroll is never hijacked. ───────────────────────────────────────── */
+.shelf {
+  position: relative; margin-top: 36px; padding-top: 40px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
 }
-.project-card:last-child { border-bottom: 2px solid var(--divider); }
-.project-card:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
-
-.project-meta {
-  display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
+.shelf::after { /* the plank */
+  content: ''; display: block; height: 14px;
+  background: linear-gradient(#3a2c22, #231a14); box-shadow: 0 16px 26px -10px rgba(0,0,0,.7);
 }
-
-.project-index {
-  font-size: 11px; font-weight: 800;
-  padding: 3px 8px; background: var(--accent); color: #0c0b0a;
+.shelf-track {
+  display: flex; align-items: flex-end; width: max-content;
+  animation: shelfDrift var(--dur, 30s) linear infinite;
 }
+.shelf:hover .shelf-track, .shelf:focus-within .shelf-track, .shelf.paused .shelf-track { animation-play-state: paused; }
+@keyframes shelfDrift { to { transform: translateX(-50%); } }
 
-.project-period {
-  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--text-muted);
+.spine {
+  flex: 0 0 auto; width: var(--w); height: var(--h); margin-right: 14px; padding: 18px 0 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  color: #ecdcb0; font-family: var(--font); cursor: pointer; border: 0; border-radius: 3px 3px 1px 1px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.38), transparent 14%, rgba(255,255,255,.1) 32%, transparent 58%, rgba(0,0,0,.32)),
+    var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.3), 0 -2px 0 rgba(255,255,255,.04) inset;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1);
 }
-
-.project-title {
-  font-size: clamp(22px, 2.6vw, 32px);
-  font-weight: 900; margin-bottom: 10px;
+.spine:hover, .spine:focus-visible { transform: translateY(-16px); outline: none; }
+.spine:focus-visible { box-shadow: inset 0 0 0 1px rgba(0,0,0,.3), 0 0 0 2px var(--accent); }
+.spine-idx, .spine-sub {
+  width: 70%; text-align: center; font-size: 12px; font-weight: 800; letter-spacing: .12em;
+  padding: 7px 0; border-block: 1px solid rgba(236,220,176,.55);
 }
-
-.project-desc {
-  font-size: 15px; line-height: 1.6;
-  color: var(--text-muted); max-width: 56ch;
-  text-wrap: pretty; margin-bottom: 14px;
+.spine-sub { font-size: 10px; font-weight: 700; opacity: .8; }
+.spine-title {
+  writing-mode: vertical-rl; font-size: 21px; font-weight: 900; letter-spacing: .02em;
+  line-height: 1; white-space: nowrap;
 }
+.spine[hidden] { display: none; }
 
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-
-.tag {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
-  padding: 4px 8px;
-  background: var(--surface); color: var(--text-muted);
-  border: 1px solid var(--divider);
-}
-
-.project-cta {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-weight: 800; font-size: 13px; color: var(--accent);
-}
-
-.project-arrow {
-  display: inline-block;
-  transition: transform .2s ease;
-}
-.project-card:hover .project-arrow { transform: translateX(6px); }
-
-.project-img {
-  height: 240px; overflow: hidden; position: relative;
-  border: 1px solid var(--divider);
-  background: var(--surface);
-}
-
-.project-img-inner {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
-}
-
-/* ─── MARQUEE ───────────────────────────────────────────────────────────── */
-.marquee-wrap {
-  margin-top: 72px;
-  background: var(--accent); overflow: hidden; padding: 18px 0;
-  user-select: none;
-  display: flex; align-items: center;
-}
-
-.marquee-track {
-  display: flex; align-items: center; gap: 36px;
-  white-space: nowrap; width: max-content;
-  font-weight: 900;
-  font-size: clamp(24px, 4vw, 42px);
-  line-height: 1;
-  letter-spacing: -0.02em; text-transform: uppercase;
-  color: #0c0b0a;
-  animation: marquee-slide 28s linear infinite;
-}
-@keyframes marquee-slide {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+@media (prefers-reduced-motion: reduce) {
+  .shelf { -webkit-mask-image: none; mask-image: none; }
+  .shelf-track { animation: none; margin-inline: auto; }
 }
 
 /* ─── 3D LOAD PLANNER DEMO ──────────────────────────────────────────────── */
@@ -599,137 +587,210 @@ nav {
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── DISPATCHER BOARD DEMO ────────────────────────────────────────────── */
-.dispatch-attn-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-.dispatch-attn-strip:empty { display: none; }
-.dispatch-attn-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 10px; font-size: 11px; font-weight: 800;
-  border: 1px solid var(--accent); color: var(--accent);
-  background: transparent; cursor: pointer; font-family: var(--font);
+/* ─── DISPATCHER BOARD DEMO — mirrors templates/delivery-dashboard.html +
+   static/css/delivery-dashboard.css of the real platform: same 3-column shell
+   (Vehicles | map | Timeline), palette, status pills and card structure.
+   Keeps its own dark palette in light theme, like a screenshot would. ───── */
+.dd {
+  --dd-bg: #0d1117; --dd-surface: #111827; --dd-surface-2: #161b22;
+  --dd-border: rgba(255,255,255,.07); --dd-border-hi: rgba(255,255,255,.14);
+  --dd-text: #f0f4f8; --dd-text-2: #b0bec9; --dd-muted: #7c8fa3;
+  --dd-accent: #2f8ceb; --dd-success: #10b981;
+  position: relative; left: 50%; translate: -50% 0;
+  width: min(1440px, calc(100vw - 32px)); margin-top: 22px;
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: 270px minmax(0, 1fr) 310px;
+  height: min(640px, 82svh);
+  background: var(--dd-bg); color: var(--dd-text);
+  border: 1px solid var(--dd-border-hi); border-radius: 12px; overflow: hidden;
+  font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; font-size: 12.5px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.45);
 }
-.dispatch-attn-chip.critical { background: var(--accent-dim); }
-.dispatch-attn-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
-}
+.dd button { font-family: inherit; }
 
-/* ─── DISPATCH MAP — fictional street layout, not real GPS tiles ────────── */
-.dispatch-map-wrap {
-  position: relative; margin-top: 20px;
-  border: 1px solid var(--divider); background: var(--bg-raise);
-  aspect-ratio: 900 / 460; max-height: 460px; overflow: hidden;
+.dd-header {
+  grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--dd-surface-2); border-bottom: 1px solid var(--dd-border);
 }
-#dispatch-map { width: 100%; height: 100%; display: block; }
-.dispatch-map-note {
-  position: absolute; left: 10px; bottom: 8px; z-index: 2;
-  font-size: 10px; color: var(--text-dim); pointer-events: none;
+.dd-title { font-size: 15px; font-weight: 600; margin-right: 6px; }
+.dd-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.dd-chip {
+  height: 26px; padding: 0 10px; border-radius: 13px; cursor: pointer;
+  background: rgba(255,255,255,.06); border: 1px solid var(--dd-border);
+  color: var(--dd-text-2); font-size: 11px; font-weight: 500; white-space: nowrap;
 }
-.dispatch-map-zone { fill: color-mix(in srgb, var(--text) 4%, transparent); stroke: var(--divider); stroke-width: 1; }
-.dispatch-map-river { fill: color-mix(in srgb, var(--accent) 4%, transparent); }
-.dispatch-map-zone-label {
-  fill: var(--text-dim); font-family: var(--font); font-size: 12px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: .06em;
-}
-.dispatch-map-route { fill: none; stroke: var(--text-dim); stroke-width: 2; stroke-dasharray: 5 5; opacity: .6; }
-.dispatch-map-route.on { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: none; opacity: 1; }
-.dispatch-map-stop { fill: var(--bg-raise); stroke: var(--text-dim); stroke-width: 1.5; }
-.dispatch-map-stop.on { stroke: var(--accent); fill: var(--accent-dim); }
-.dispatch-map-stop-num {
-  fill: var(--text-muted); font-family: var(--font); font-size: 9px; font-weight: 800; text-anchor: middle; pointer-events: none;
-}
-.dispatch-map-vehicle { color: var(--text-dim); cursor: pointer; }
-.dispatch-map-vehicle.on { color: var(--accent); }
-.dispatch-map-vehicle.state-done { opacity: .35; }
-.dispatch-map-vehicle-tri { fill: currentColor; stroke: var(--bg-raise); stroke-width: 1; }
-.dispatch-map-vehicle-halo { fill: none; stroke: currentColor; stroke-width: 1.5; opacity: 0; }
-.dispatch-map-vehicle.state-arrived .dispatch-map-vehicle-halo { animation: dispatchPulse 1.8s ease-out infinite; }
-.dispatch-map-vehicle-label {
-  fill: var(--text); font-family: var(--font); font-size: 11px; font-weight: 800; pointer-events: none;
-}
-@keyframes dispatchPulse {
-  from { r: 9; stroke-opacity: .7; }
-  to   { r: 22; stroke-opacity: 0; }
-}
+.dd-chip:hover { background: rgba(255,255,255,.1); color: var(--dd-text); }
+.dd-chip.active { background: rgba(56,139,253,.16); border-color: var(--dd-accent); color: var(--dd-text); }
+.dd-poll { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--dd-muted); }
+.dd-poll::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--dd-success); box-shadow: 0 0 0 3px rgba(16,185,129,.18); }
 
-.dispatch-wrap {
-  display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 24px;
-  margin-top: 20px; align-items: start;
+.dd-left, .dd-right { display: flex; flex-direction: column; min-height: 0; background: var(--dd-surface); }
+.dd-left { border-right: 1px solid var(--dd-border); }
+.dd-right { border-left: 1px solid var(--dd-border); }
+.dd-panel-head {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  border-bottom: 1px solid var(--dd-border); flex-shrink: 0;
 }
+.dd-panel-head h4 { margin: 0; font-size: 13px; font-weight: 600; }
+.dd-count {
+  margin-left: auto; font-size: 10.5px; font-weight: 600; color: var(--dd-text-2);
+  background: rgba(255,255,255,.06); border-radius: 10px; padding: 2px 8px;
+}
+.dd-scroll { overflow-y: auto; min-height: 0; flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px; scrollbar-width: thin; }
+.dd-empty { padding: 30px 16px; text-align: center; color: var(--dd-text-2); }
 
-.dispatch-vehicles { display: flex; flex-direction: column; gap: 8px; }
-.dispatch-vehicle {
-  display: block; width: 100%; padding: 12px;
-  border: 1px solid var(--divider); background: var(--surface);
-  cursor: pointer; text-align: left; font-family: var(--font); color: var(--text);
-  transition: border-color .2s ease, background .2s ease;
+/* Attention strip */
+.dd-attn { display: flex; gap: 6px; padding: 8px; overflow-x: auto; border-bottom: 1px solid var(--dd-border); flex-shrink: 0; }
+.dd-attn:empty { display: none; }
+.dd-attn-chip {
+  display: flex; flex-direction: column; gap: 1px; padding: 5px 10px; flex-shrink: 0; text-align: left;
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 6px;
+  cursor: pointer; white-space: nowrap; color: var(--dd-text);
 }
-.dispatch-vehicle:hover { border-color: var(--accent); }
-.dispatch-vehicle.on { border-color: var(--accent); background: var(--accent-dim); }
-.dispatch-vehicle-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.dispatch-vehicle-plate { font-size: 13px; font-weight: 800; }
-.dispatch-vehicle-driver { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.dispatch-vehicle-stop { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
-.dispatch-progress-track { height: 4px; background: var(--surface-hi); margin-top: 8px; overflow: hidden; }
-.dispatch-progress-fill { height: 100%; background: var(--accent); width: 0; transition: width .4s ease; }
-.dispatch-vehicle-meta {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  margin-top: 8px; font-size: 10px; color: var(--text-dim);
-  font-variant-numeric: tabular-nums;
-}
-.dispatch-vehicle-flags { display: flex; gap: 5px; margin-top: 8px; }
+.dd-attn-chip b { font-size: 11px; font-weight: 700; }
+.dd-attn-chip span { font-size: 9.5px; color: #f87171; }
+.dd-attn-chip.sev-warn { background: rgba(251,146,60,.1); border-color: rgba(251,146,60,.3); }
+.dd-attn-chip.sev-warn span { color: #fb923c; }
+.dd-attn-chip.sev-critical { background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.55); }
 
-.dispatch-badge {
-  display: inline-block; padding: 2px 7px; font-size: 10px; font-weight: 800;
-  letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--divider); color: var(--text-muted);
+/* Vehicle cards */
+.dd-vcard {
+  display: flex; flex-direction: column; gap: 6px; width: 100%; padding: 10px 12px; text-align: left;
+  background: rgba(255,255,255,.03); border: 1px solid var(--dd-border); border-radius: 8px;
+  color: var(--dd-text); cursor: pointer; transition: background .18s ease, border-color .18s ease;
 }
-.dispatch-badge.st-arrived, .dispatch-badge.st-executing { border-color: var(--accent); color: var(--accent); }
-.dispatch-badge.st-completed { border-color: var(--text-dim); color: var(--text-dim); }
-.dispatch-badge.st-skipped, .dispatch-badge.st-cancelled { border-color: var(--text-dim); color: var(--text-dim); text-decoration: line-through; }
+.dd-vcard:hover { background: rgba(255,255,255,.06); border-color: var(--dd-border-hi); }
+.dd-vcard.selected { background: rgba(56,139,253,.08); border-color: var(--dd-accent); }
+.dd-vc-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.dd-vc-row { display: flex; align-items: center; gap: 5px; }
+.dd-vc-plate { font-size: 13px; font-weight: 600; }
+.dd-vc-driver { font-size: 11.5px; color: var(--dd-text-2); margin-top: 1px; }
+.dd-vc-dot { width: 7px; height: 7px; border-radius: 50%; background: #f87171; box-shadow: 0 0 0 2px rgba(239,68,68,.2); }
+.dd-vc-dot.sev-warn { background: #fb923c; box-shadow: 0 0 0 2px rgba(251,146,60,.2); }
+.dd-vc-stop { font-size: 11.5px; color: var(--dd-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dd-vc-progress { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--dd-text-2); }
+.dd-vc-bar { flex: 1; height: 4px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; }
+.dd-vc-fill { height: 100%; border-radius: 2px; background: var(--dd-accent); transition: width .3s ease; }
+.dd-vc-fill.status-completed { background: var(--dd-success); }
+.dd-vc-fill.status-arrived { background: #fb923c; }
+.dd-vc-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 10.5px; color: var(--dd-text-2); }
+.dd-vc-meta span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd-vc-meta span:last-child { white-space: nowrap; }
 
-.dispatch-timeline-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.dispatch-timeline-plate { font-size: 15px; font-weight: 800; }
-.dispatch-timeline-driver { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-#dispatch-revert-btn { font-size: 11px; padding: 7px 12px; }
+/* Status pills — same colours per state as production */
+.dd-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px; flex-shrink: 0;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
+}
+.dd-badge.status-planned   { background: rgba(156,163,175,.1);  color: #9ca3af; }
+.dd-badge.status-executing { background: rgba(34,211,238,.15);  color: #22d3ee; }
+.dd-badge.status-arrived   { background: rgba(251,146,60,.15);  color: #fb923c; }
+.dd-badge.status-completed { background: rgba(46,160,67,.15);   color: var(--dd-success); }
+.dd-badge.status-skipped   { background: rgba(234,179,8,.15);   color: #eab308; }
+.dd-badge.status-cancelled { background: rgba(239,68,68,.15);   color: #f87171; }
 
-.dispatch-current {
-  margin-top: 16px; padding: 14px; border: 1px solid var(--accent); background: var(--accent-dim); cursor: pointer;
-}
-.dispatch-current-label { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
-.dispatch-current-name { font-size: 15px; font-weight: 800; margin-top: 4px; }
-.dispatch-current-addr { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.dispatch-current-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+/* Map */
+.dd-center { position: relative; min-height: 0; background: #1a212b; overflow: hidden; }
+#dispatch-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.dd-map-bg { fill: #1a212b; }
+.dd-map-minor { fill: none; stroke: rgba(255,255,255,.035); stroke-width: 1; }
+.dd-map-zone { fill: rgba(255,255,255,.018); stroke: rgba(255,255,255,.06); stroke-width: 1; stroke-dasharray: 6 5; }
+.dd-map-zone-label { fill: rgba(240,244,248,.3); font: 600 12px 'Inter', sans-serif; text-transform: uppercase; letter-spacing: .14em; }
+.dd-map-river { fill: none; stroke: #16324a; stroke-width: 26; stroke-linecap: round; }
+.dd-map-road { stroke: #2b3543; stroke-width: 9; }
+.dd-map-road-in { stroke: #354253; stroke-width: 1.5; stroke-dasharray: 8 8; }
+.dd-route { fill: none; stroke: #388bfd; stroke-width: 2.5; stroke-linejoin: round; opacity: .3; }
+.dd-route.on { stroke-width: 4; opacity: .95; }
+.dd-stop { stroke: rgba(13,17,23,.85); stroke-width: 2; opacity: .45; }
+.dd-stop.on { opacity: 1; }
+.dd-stop-ring { fill: none; stroke: rgba(255,255,255,.7); stroke-width: 1; opacity: .45; }
+.dd-stop-ring.on { opacity: 1; }
+.dd-veh { cursor: pointer; }
+.dd-veh.state-done { opacity: .55; }
+.dd-veh-label { fill: var(--dd-surface-2); stroke-width: 2; }
+.dd-veh-text { fill: var(--dd-text); font: 600 11px 'Inter', sans-serif; text-anchor: middle; pointer-events: none; }
+.dd-veh-halo { fill: none; stroke-width: 2; opacity: 0; }
+.dd-veh.state-arrived .dd-veh-halo { animation: dispatchPulse 1.8s ease-out infinite; }
+@keyframes dispatchPulse { from { r: 10; opacity: .8; } to { r: 24; opacity: 0; } }
 
-.dispatch-stop-list { margin-top: 16px; border-top: 1px solid var(--divider); }
-.dispatch-stop { border-bottom: 1px solid var(--divider); }
-.dispatch-stop-head {
-  display: flex; align-items: center; gap: 10px; padding: 12px 0; cursor: pointer;
+.dd-legend {
+  position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; flex-wrap: wrap; gap: 4px 12px; max-width: calc(100% - 20px);
+  padding: 6px 10px; border-radius: 8px; background: rgba(22,27,34,.88); border: 1px solid var(--dd-border);
+  font-size: 10.5px; color: var(--dd-text-2); pointer-events: none;
 }
-.dispatch-stop-seq {
-  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
-  background: var(--surface-hi); color: var(--text-muted);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800;
+.dd-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.dd-legend i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.dd-map-note { position: absolute; right: 10px; bottom: 52px; z-index: 2; font-size: 10px; color: rgba(240,244,248,.35); pointer-events: none; }
+.dd-vibar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px; background: var(--dd-surface-2); border-top: 1px solid var(--dd-border); font-size: 12px;
 }
-.dispatch-stop-name { font-size: 13px; font-weight: 700; flex: 1; min-width: 0; }
-.dispatch-move-btns { display: flex; gap: 2px; }
-.dispatch-move-btn {
-  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--divider); background: transparent; color: var(--text-muted); cursor: pointer; padding: 0;
-}
-.dispatch-move-btn:disabled { opacity: .25; cursor: not-allowed; }
-.dispatch-move-btn:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
-.dispatch-stop-chevron { color: var(--text-dim); transition: transform .2s ease; flex-shrink: 0; }
-.dispatch-stop.open .dispatch-stop-chevron { transform: rotate(180deg); }
-.dispatch-stop-body { padding: 0 0 14px 32px; }
-.dispatch-stop-body[hidden] { display: none; }
-.dispatch-stop-detail { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
-.dispatch-stop-detail b { color: var(--text); font-weight: 700; }
-.dispatch-stop-reason { margin-top: 6px; font-size: 12px; color: var(--accent); }
-.dispatch-stop-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.dispatch-stop-actions .btn { font-size: 11px; padding: 6px 11px; }
+.dd-vibar-left, .dd-vibar-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.dd-vibar-left b { font-size: 13px; font-weight: 600; }
+.dd-vibar span { color: var(--dd-text-2); }
 
-@media (max-width: 700px) {
-  .dispatch-wrap { grid-template-columns: 1fr; }
+/* Timeline */
+.dd-current {
+  flex-shrink: 0; padding: 10px 12px; cursor: pointer;
+  background: rgba(56,139,253,.06); border-bottom: 1px solid var(--dd-border); font-size: 11.5px;
+}
+.dd-cs-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.dd-cs-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--dd-accent); }
+.dd-cs-station { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.dd-cs-detail { display: flex; flex-direction: column; gap: 2px; color: var(--dd-text-2); }
+.dd-cs-detail a { color: var(--dd-accent); }
+.dd-cs-detail b { color: var(--dd-text); font-weight: 600; }
+
+.dd-tl-item { flex-shrink: 0; border: 1px solid var(--dd-border); border-radius: 8px; overflow: hidden; transition: border-color .18s ease; }
+.dd-tl-item.current { border-color: var(--dd-accent); box-shadow: 0 0 0 1px var(--dd-accent); }
+.dd-tl-item.completed { opacity: .65; }
+.dd-tl-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; user-select: none; }
+.dd-tl-head:hover { background: rgba(255,255,255,.04); }
+.dd-tl-seq {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+  background: rgba(156,163,175,.1); color: #9ca3af;
+}
+.dd-tl-item.current .dd-tl-seq { background: var(--dd-accent); color: #fff; }
+.dd-tl-item.completed .dd-tl-seq { background: rgba(46,160,67,.15); color: var(--dd-success); }
+.dd-tl-item.status-skipped .dd-tl-seq, .dd-tl-item.status-cancelled .dd-tl-seq { background: rgba(239,68,68,.15); color: #f87171; }
+.dd-tl-station { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dd-tl-move { display: flex; gap: 2px; }
+.dd-tl-move button {
+  width: 22px; height: 22px; padding: 0; border-radius: 4px; cursor: pointer; font-size: 9px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--dd-border); color: var(--dd-text-2);
+}
+.dd-tl-move button:disabled { opacity: .25; cursor: not-allowed; }
+.dd-tl-move button:not(:disabled):hover { border-color: var(--dd-accent); color: var(--dd-text); }
+.dd-tl-chev { color: var(--dd-muted); font-size: 10px; transition: transform .2s ease; }
+.dd-tl-item.open .dd-tl-chev { transform: rotate(180deg); }
+.dd-tl-body { display: none; padding: 8px 10px 10px; border-top: 1px solid var(--dd-border); font-size: 11.5px; }
+.dd-tl-item.open .dd-tl-body { display: block; }
+.dd-tl-detail { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; }
+.dd-tl-detail dt { color: var(--dd-text-2); font-weight: 500; }
+.dd-tl-detail dd { margin: 0; color: var(--dd-text); }
+.dd-tl-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--dd-border); }
+.dd-btn {
+  height: 32px; padding: 0 12px; border-radius: 6px; cursor: pointer; font-size: 12.5px; font-weight: 500;
+  background: rgba(255,255,255,.06); border: 1px solid var(--dd-border-hi); color: #c9d1d9;
+  transition: background .18s ease;
+}
+.dd-btn:hover { background: rgba(255,255,255,.12); color: var(--dd-text); }
+.dd-btn.danger { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.3); color: #f87171; }
+.dd-btn.danger:hover { background: rgba(239,68,68,.25); }
+.dd-btn.revert { margin-left: auto; border-style: dashed; color: var(--dd-text-2); }
+.dd-btn.revert:hover { border-style: solid; }
+
+@media (max-width: 1000px) {
+  .dd { grid-template-columns: 1fr; grid-template-rows: none; height: auto; }
+  .dd-left, .dd-right { border: 0; border-top: 1px solid var(--dd-border); }
+  .dd-left .dd-scroll { max-height: 290px; }
+  .dd-center { height: 340px; order: -1; grid-row: 2; }
+  .dd-left { grid-row: 3; }
+  .dd-right { grid-row: 4; }
+  .dd-right .dd-scroll { overflow: visible; }
+  .dd-map-note { display: none; }
 }
 
 /* ─── ROBOTIC ARM DEMO ────────────────────────────────────────────────── */
@@ -927,42 +988,141 @@ footer {
 }
 .modal-backdrop.open { display: block; }
 
-.modal-box {
-  max-width: 820px; margin: 0 auto;
-  background: var(--bg);
-  border: 2px solid var(--divider);
-  padding: 32px;
+/* ─── CASE-STUDY BOOK — paper spread. Page turns, the cover opening and the
+   book closing are all one mechanism: a "leaf" hinged on the spine, rotated
+   with an inline rotateY (driven by the pointer while dragging). ────────── */
+.book-backdrop.open {
+  overflow: hidden; /* a page mid-turn can swing past the spread */
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(8,7,6,.86); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: opacity .45s ease;
 }
+.book-backdrop.open { animation: bookFadeIn .3s ease; }
+@keyframes bookFadeIn { from { opacity: 0; } }
+.book-backdrop.fading { opacity: 0; }
+.book-wrap { position: relative; width: min(1120px, 100%); }
+.book {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  height: min(660px, calc(100svh - 150px)); perspective: 2600px;
+  touch-action: pan-y; user-select: none; -webkit-user-select: none;
+}
+.book-page, .book-leaf-face {
+  position: relative; overflow-y: auto; padding: 40px 44px 52px;
+  background: #f4efe4; color: #1d1a16; scrollbar-width: thin;
+}
+.book-page { cursor: grab; }
+.book.dragging, .book.dragging .book-page { cursor: grabbing; }
+.book-left  { border-radius: 10px 0 0 10px; box-shadow: inset -34px 0 40px -34px rgba(60,40,20,.45), 0 30px 70px rgba(0,0,0,.5); }
+.book-right { border-radius: 0 10px 10px 0; box-shadow: inset 34px 0 40px -34px rgba(60,40,20,.45), 0 30px 70px rgba(0,0,0,.5); }
+.book-page[hidden] { display: none; }
 
-.modal-head {
-  display: flex; justify-content: space-between;
-  align-items: flex-start; gap: 16px; margin-bottom: 20px;
+.book-leaf {
+  position: absolute; top: 0; bottom: 0; width: 50%; z-index: 3;
+  transform-style: preserve-3d; transition: transform .75s cubic-bezier(.45,.05,.25,1);
 }
-.modal-title {
-  font-size: clamp(24px, 4vw, 36px);
-  font-weight: 900; margin-top: 12px;
+.book-leaf.fwd  { left: 50%; transform-origin: left center; }
+.book-leaf.back { left: 0;   transform-origin: right center; }
+.book-leaf-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: none; }
+.book-leaf-face.flip { transform: rotateY(180deg); }
+
+/* Front cover — colour comes from the spine that was clicked (--c) */
+.book-leaf-face.book-cover {
+  overflow: hidden; border-radius: 4px 10px 10px 4px; color: #ecdcb0; padding: 0;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.45), transparent 7%, rgba(255,255,255,.06) 9%, transparent 16%),
+    radial-gradient(circle at 70% 20%, rgba(255,255,255,.08), transparent 60%),
+    var(--c, #24443a);
 }
-.modal-body { border-top: 2px solid var(--divider); padding-top: 20px; }
-.modal-section-label {
-  font-size: 12px; font-weight: 800; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+.bc { position: absolute; inset: 18px 18px 18px 30px; border: 1px solid rgba(236,220,176,.45);
+  display: flex; flex-direction: column; justify-content: space-between; padding: 30px 28px; }
+.bc-idx { font-size: 13px; font-weight: 800; letter-spacing: .14em; }
+.bc-kicker { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.bc-title { font-size: clamp(30px, 3.8vw, 52px); font-weight: 900; line-height: 1; letter-spacing: -.02em; margin: 10px 0 14px; }
+.bc-sub { font-size: 15px; line-height: 1.5; opacity: .85; max-width: 30ch; }
+.bc-foot { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+
+/* Soft page turn layers (see softRender) */
+.soft { position: absolute; top: 0; z-index: 3; pointer-events: none; }
+.soft-front, .soft-shade, .soft-flapwrap { position: absolute; inset: 0; }
+.soft-front, .soft-shade { overflow: hidden; }
+.soft-flapwrap { filter: drop-shadow(0 2px 9px rgba(0,0,0,.28)); }
+.soft-flap {
+  position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  overflow: hidden; transform-origin: 0 0; background: #ede6d8;
 }
-.modal-bullets {
-  margin: 0 0 24px; padding-left: 18px;
-  display: grid; gap: 10px;
-  color: var(--text-muted); font-size: 15px; line-height: 1.65;
+.soft-band { position: absolute; height: 4000px; margin-top: -2000px; transform-origin: 0 50%; }
+.soft-shade .soft-band { background: linear-gradient(to right, rgba(0,0,0,.32), rgba(0,0,0,0)); }
+.soft-flap .soft-band { background: linear-gradient(to right, rgba(0,0,0,.16), rgba(255,255,255,.55) 14%, rgba(255,255,255,0) 45%, rgba(0,0,0,.08)); }
+
+.book-close {
+  position: absolute; top: -46px; right: 0; width: 36px; height: 36px; cursor: pointer;
+  background: transparent; border: 1px solid rgba(242,239,238,.3); color: #f2efee; font-size: 16px;
+}
+.book-nav {
+  display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px;
+  color: #f2efee; font-size: 13px; font-variant-numeric: tabular-nums;
+}
+.book-dots { display: flex; gap: 6px; }
+.book-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(242,239,238,.3); transition: background .3s, transform .3s; }
+.book-dots i.on { background: var(--accent); transform: scale(1.3); }
+.book-hint { color: rgba(242,239,238,.55); font-size: 12px; }
+
+/* Page content */
+.bp { min-height: 100%; }
+.bp p { font-size: 15px; line-height: 1.65; color: #3b352d; margin-bottom: 12px; text-wrap: pretty; }
+.bp-kicker { font-size: 11px !important; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #b3361f !important; }
+.bp-title { font-size: clamp(22px, 2.4vw, 30px); font-weight: 900; line-height: 1.12; letter-spacing: -.01em; margin: 6px 0 18px; }
+.bp-img { width: 100%; height: 44%; min-height: 150px; object-fit: cover; display: block; margin-bottom: 22px; border: 1px solid rgba(29,26,22,.15); pointer-events: none; }
+.bp-list { list-style: none; display: grid; gap: 12px; font-size: 14.5px; line-height: 1.6; color: #3b352d; }
+.bp-list li { padding-left: 16px; position: relative; }
+.bp-list li::before { content: ''; position: absolute; left: 0; top: .6em; width: 6px; height: 6px; background: #b3361f; }
+.bp-list b, .bp-stack dt { color: #1d1a16; }
+.bp-stack { display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; font-size: 14px; line-height: 1.5; }
+.bp-stack dt { font-weight: 800; white-space: nowrap; }
+.bp-stack dd { margin: 0; color: #5a5146; }
+.bp-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+.bp-table th, .bp-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid rgba(29,26,22,.12); }
+.bp-table th { width: 44px; color: #b3361f; }
+.bp-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.bp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 8px 0 26px; }
+.bp-stats div { border-top: 2px solid #1d1a16; padding-top: 10px; }
+.bp-stats b { display: block; font-size: clamp(26px, 3vw, 38px); font-weight: 900; line-height: 1; color: #b3361f; margin-bottom: 6px; }
+.bp-stats span { font-size: 12px; color: #5a5146; }
+.bp-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.bp-links .btn-secondary { color: #1d1a16; border-color: rgba(29,26,22,.3); }
+.bp-num { position: absolute; bottom: 18px; font-size: 11px; color: #9a8f7d; font-variant-numeric: tabular-nums; }
+.book-left .bp-num { left: 44px; }
+.book-right .bp-num { right: 44px; }
+
+@media (max-width: 860px) {
+  .book { grid-template-columns: 1fr; height: calc(100svh - 150px); }
+  .book-left { border-radius: 10px; }
+  .book-leaf.fwd { left: 0; width: 100%; }
+  .book-page { padding: 30px 24px 48px; }
+  .book-left .bp-num { left: 24px; }
+  .book-left.slide { animation: pageSlide .35s ease; }
+  @keyframes pageSlide { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 28px)); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-left.slide { animation: none; }
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
 @media (max-width: 860px) {
   .nav-links { display: none; }
   .hero-grid { grid-template-columns: 1fr; }
-  .hero-portrait { height: 300px; order: -1; }
+  .hero { min-height: 0; padding-top: 32px; }
+  .hero-copy > *, .hero-name-wrap, .hero-portrait { grid-column: 1; grid-row: auto; }
+  .hero-portrait { min-height: 0; height: 340px; order: -1; }
+  .hero-name-wrap { margin: 18px 0 20px; }
+  .hero-eyebrow { margin-top: 20px; order: 1; }
+  .hero-terminal, .hero-bio, .hero-actions { order: 2; }
+  body::after { opacity: .045; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .stat-cell:nth-child(2) { border-right: 0; padding-right: 0; }
   .stat-cell:nth-child(3) { padding-left: 0; }
-  .project-card { grid-template-columns: 1fr; }
-  .project-img { display: none; }
+  .spine { width: calc(var(--w) * .8); height: calc(var(--h) * .8); }
+  .spine-title { font-size: 18px; }
   .scene-wrap { height: 300px; }
   .arm-scene-wrap { height: 300px; }
   .demo-tabs { gap: 18px; }
@@ -1005,26 +1165,26 @@ footer {
 <!-- ── Hero ───────────────────────────────────────────────────────── -->
 <header id="top" class="hero">
   <div class="hero-grid">
-    <div>
-      <div class="hero-eyebrow">
+    <div class="hero-copy">
+      <div class="hero-eyebrow reveal">
         <span data-l="en">Software Engineering Intern / Developer</span>
         <span data-l="vi">Thực tập sinh / Lập trình viên phần mềm</span>
       </div>
-      <div class="hero-name-wrap">
+      <div class="hero-name-wrap reveal" style="--d:1">
         <h1 class="hero-name">Nguyễn Việt<br>Anh Khoa</h1>
       </div>
       
       <!-- Terminal prompt with active backspace typewriter & blinking cursor -->
-      <div class="hero-terminal">
+      <div class="hero-terminal reveal" style="--d:2">
         <span class="hero-terminal-prompt">khoa@siu:~$</span>
         <span id="typed-text">flask run --fleet 36</span><span class="cursor-blink"></span>
       </div>
 
-      <p class="hero-bio">
+      <p class="hero-bio reveal" style="--d:3">
         <span data-l="en">Computer Science student at Saigon International University (SIU), with products already in daily use: a Flask dispatch platform running a 36-truck fleet, an Android app doing on-device plant disease detection, and a robot arm controller written in FastAPI. Comfortable across the full chain — process analysis and requirements gathering through to deployed, tested code. Eight years studying in the US and experience teaching English (IELTS 7.0) support clear documentation and cross-cultural communication.</span>
         <span data-l="vi">Sinh viên Khoa học Máy tính tại Trường Đại học Quốc tế Sài Gòn (SIU), đã đưa sản phẩm vào sử dụng thực tế: nền tảng điều vận Flask dùng hằng ngày cho đội xe tải 36 chiếc, ứng dụng Android nhận diện bệnh cây chạy trực tiếp trên thiết bị, và bộ điều khiển robot viết bằng FastAPI. Làm được trọn khâu từ phân tích quy trình, thu thập yêu cầu cho tới code đã triển khai và có kiểm thử. Tám năm học tại Mỹ cùng kinh nghiệm dạy tiếng Anh (IELTS 7.0) giúp tôi viết tài liệu rõ ràng và giao tiếp đa văn hoá.</span>
       </p>
-      <div class="hero-actions">
+      <div class="hero-actions reveal" style="--d:4">
         <a class="btn btn-primary" data-l="en" href="uploads/NguyenVietAnhKhoaRESUME_EN.pdf" download>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 12l5 5 5-5M5 21h14"/></svg>
           Download CV
@@ -1047,8 +1207,8 @@ footer {
         </a>
       </div>
     </div>
-    <div class="hero-portrait">
-      <img class="portrait-inner" src="images/portrait.webp" alt="Portrait of Nguyễn Việt Anh Khoa">
+    <div class="hero-portrait reveal">
+      <img class="portrait-inner" data-speed="0.1" src="images/portrait.webp" alt="Portrait of Nguyễn Việt Anh Khoa">
     </div>
   </div>
 </header>
@@ -1076,13 +1236,13 @@ footer {
 </div>
 
 <!-- ── Work ────────────────────────────────────────────────────────── -->
-<section id="work" class="section">
+<section id="work" class="section work">
   <div class="section-head">
     <h2 class="section-title">
       <span data-l="en">Selected work</span><span data-l="vi">Dự án tiêu biểu</span>
     </h2>
     <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)">
-      <span data-l="en">Filter by stack</span><span data-l="vi">Lọc theo công nghệ</span>
+      <span data-l="en">Pick a book to open it</span><span data-l="vi">Chọn một cuốn để mở</span>
     </div>
   </div>
   <div class="chip-row">
@@ -1094,69 +1254,28 @@ footer {
     <button class="chip" data-chip="javascript" onclick="setFilter('javascript')">JavaScript</button>
   </div>
 
-  <div class="projects-list">
-    <div class="projects-list-rule"></div>
-
-    <!-- Project 1 -->
-    <article class="project-card" data-proj="p1" data-tech="python flask javascript" onclick="openModal('m1')">
-      <div>
-        <div class="project-meta">
-          <span class="project-index">01</span>
-          <span class="project-period"><span data-l="en">In production · 2025–2026</span><span data-l="vi">Đang vận hành · 2025–2026</span></span>
-        </div>
-        <h3 class="project-title"><span data-l="en">Fleet Logistics Platform</span><span data-l="vi">Nền tảng điều vận đội xe</span></h3>
-        <p class="project-desc">
-          <span data-l="en">A seven-module dispatch platform used daily by a 36-truck fleet — GPS tracking, geofencing, delivery planning and proof-of-delivery photos across more than 130 REST endpoints.</span>
-          <span data-l="vi">Nền tảng điều vận 7 phân hệ, dùng hằng ngày cho đội xe tải 36 chiếc — theo dõi GPS, geofencing, lập kế hoạch giao hàng, ảnh xác nhận giao hàng — trên 130 REST endpoint.</span>
-        </p>
-        <div class="tags">
-          <span class="tag">Python</span><span class="tag">Flask</span><span class="tag">SQLite</span><span class="tag">JavaScript</span><span class="tag">Leaflet</span><span class="tag">Three.js</span><span class="tag">pytest</span><span class="tag">Render</span>
-        </div>
-        <span class="project-cta">
-          <span data-l="en">Read case study</span><span data-l="vi">Xem chi tiết</span>
-          <span class="project-arrow">→</span>
-        </span>
-      </div>
-      <div class="project-img">
-        <img class="project-img-inner" src="images/project-fleet.jpg" alt="Fleet dashboard preview">
-      </div>
-    </article>
-
-    <!-- Project 2 -->
-    <article class="project-card" data-proj="p3" data-tech="python fastapi react javascript" onclick="openModal('m3')">
-      <div>
-        <div class="project-meta">
-          <span class="project-index">02</span>
-          <span class="project-period"><span data-l="en">Robotics · Hardware in the loop</span><span data-l="vi">Robotics · Kết nối phần cứng</span></span>
-        </div>
-        <h3 class="project-title"><span data-l="en">Color-Sorting Robotic Arm Controller</span><span data-l="vi">Bộ điều khiển tay robot phân loại theo màu</span></h3>
-        <p class="project-desc">
-          <span data-l="en">A FastAPI backend managing joint limits, the serial protocol and a sorting state machine for a 6-axis arm, with a React control panel and a simulation mode that runs the whole flow without hardware.</span>
-          <span data-l="vi">Backend FastAPI quản lý giới hạn khớp, giao thức serial và máy trạng thái phân loại cho tay robot 6 trục, kèm bảng điều khiển React và chế độ mô phỏng chạy trọn luồng khi không có phần cứng.</span>
-        </p>
-        <div class="tags">
-          <span class="tag">FastAPI</span><span class="tag">React (Vite)</span><span class="tag">OpenCV</span><span class="tag">pySerial</span><span class="tag">Arduino</span>
-        </div>
-        <span class="project-cta">
-          <span data-l="en">Read case study</span><span data-l="vi">Xem chi tiết</span>
-          <span class="project-arrow">→</span>
-        </span>
-      </div>
-      <div class="project-img">
-        <img class="project-img-inner" src="images/project-robot.jpg" alt="Robot arm control panel">
-      </div>
-    </article>
+  <!-- Shelf: the three spines drift right→left on their own (JS clones them
+       to fill the width); hover pauses, click opens that book. -->
+  <div class="shelf" id="shelf">
+    <div class="shelf-track" id="shelf-track">
+      <button class="spine" data-book="p1" data-proj="p1" data-tech="python flask javascript" style="--c:#24443a;--w:112px;--h:360px">
+        <span class="spine-idx">01</span>
+        <span class="spine-title"><span data-l="en">Truck Load Planner</span><span data-l="vi">Xếp hàng lên xe</span></span>
+        <span class="spine-sub">Three.js</span>
+      </button>
+      <button class="spine" data-book="p2" data-proj="p2" data-tech="python flask javascript" style="--c:#1c2c48;--w:128px;--h:392px">
+        <span class="spine-idx">02</span>
+        <span class="spine-title"><span data-l="en">Dispatcher Board</span><span data-l="vi">Bảng điều phối</span></span>
+        <span class="spine-sub">Flask</span>
+      </button>
+      <button class="spine" data-book="p3" data-proj="p3" data-tech="python fastapi react javascript" style="--c:#5a1f1b;--w:104px;--h:340px">
+        <span class="spine-idx">03</span>
+        <span class="spine-title"><span data-l="en">Robotic Arm</span><span data-l="vi">Tay robot</span></span>
+        <span class="spine-sub">FastAPI</span>
+      </button>
+    </div>
   </div>
 </section>
-
-<!-- ── Marquee ──────────────────────────────────────────────────────── -->
-<div class="marquee-wrap">
-  <div class="marquee-track" aria-hidden="true">
-    <span>Python</span><span>·</span><span>Flask</span><span>·</span><span>FastAPI</span><span>·</span><span>PyTorch</span><span>·</span><span>React</span><span>·</span><span>Android</span><span>·</span><span>Docker</span><span>·</span><span>SQL</span><span>·</span>
-    <span>Python</span><span>·</span><span>Flask</span><span>·</span><span>FastAPI</span><span>·</span><span>PyTorch</span><span>·</span><span>React</span><span>·</span><span>Android</span><span>·</span><span>Docker</span><span>·</span><span>SQL</span><span>·</span>
-    <span>Python</span><span>·</span><span>Flask</span><span>·</span><span>FastAPI</span><span>·</span><span>PyTorch</span><span>·</span><span>React</span><span>·</span><span>Android</span><span>·</span><span>Docker</span><span>·</span><span>SQL</span><span>·</span>
-  </div>
-</div>
 
 <!-- ── Live Demos ───────────────────────────────────────────────────── -->
 <section id="demo" class="section">
@@ -1248,33 +1367,46 @@ footer {
       <span data-l="en">Dispatcher board</span><span data-l="vi">Bảng điều phối</span>
     </h3>
     <p style="max-width:68ch;color:var(--text-muted);margin-top:16px">
-      <span data-l="en">A mini-rebuild of the dispatch dashboard's vehicle list, stop timeline and live map — the part of the fleet platform a dispatcher actually lives in all day. Same execution states, same actions (advance, skip, cancel, revert, reorder) and the same stuck / GPS-stale attention flags as the production board, running on three sample assignments and a fictional street layout instead of the live 36-truck fleet on real map tiles. Pick a vehicle, expand a stop, work the timeline — watch it move on the map.</span>
-      <span data-l="vi">Bản dựng lại thu nhỏ của bảng điều phối — danh sách xe, timeline điểm dừng và bản đồ trực tiếp — phần dispatcher viên dùng cả ngày trong nền tảng điều vận. Cùng các trạng thái thực thi, cùng các thao tác (xác nhận tiếp, bỏ qua, hủy, hoàn tác, đổi thứ tự) và cùng cờ cảnh báo kẹt xe / GPS cũ như bảng thật — chạy trên ba chuyến mẫu và một bản đồ đường phố hư cấu thay vì đội xe 36 chiếc thật trên nền bản đồ thật. Chọn một xe, mở rộng một điểm dừng, thao tác trên timeline — xem xe chạy trên bản đồ.</span>
+      <span data-l="en">A rebuild of the dispatch dashboard dispatchers use all day: vehicles on the left, the live map in the middle, and the selected truck's stop timeline on the right. Same layout, colours, statuses and actions (advance, skip, cancel, revert, reorder) as production, running on three sample trucks and a made-up street grid. Click a truck, then work through its stops.</span>
+      <span data-l="vi">Bản dựng lại bảng điều phối mà nhân viên điều phối dùng cả ngày: danh sách xe bên trái, bản đồ ở giữa và timeline điểm dừng của xe đang chọn bên phải. Cùng bố cục, màu sắc, trạng thái và thao tác (xác nhận, bỏ qua, hủy, hoàn tác, đổi thứ tự) như bản thật, chạy trên ba xe mẫu và một sơ đồ đường hư cấu. Chọn một xe rồi thao tác từng điểm dừng.</span>
     </p>
 
-    <div class="dispatch-attn-strip" id="dispatch-attn-strip"></div>
+    <div class="dd" id="dispatch-board">
+      <header class="dd-header">
+        <div class="dd-title"><span data-l="en">Dispatch Dashboard</span><span data-l="vi">Bảng điều phối</span></div>
+        <div class="dd-chips" id="dispatch-quick"></div>
+        <span class="dd-poll"><span data-l="en">Auto-refresh 15s</span><span data-l="vi">Tự làm mới 15s</span></span>
+      </header>
 
-    <div class="dispatch-map-wrap" id="dispatch-map-wrap">
-      <svg id="dispatch-map" viewBox="0 0 900 460" preserveAspectRatio="xMidYMid meet"></svg>
-      <div class="dispatch-map-note"><span data-l="en">Fictional street layout, for demo only — not real HCMC geography.</span><span data-l="vi">Sơ đồ đường phố hư cấu, chỉ phục vụ demo — không phải bản đồ TP.HCM thật.</span></div>
-    </div>
-
-    <div class="dispatch-wrap">
-      <div class="dispatch-vehicles" id="dispatch-vehicles"></div>
-      <div class="dispatch-timeline">
-        <div class="dispatch-timeline-head">
-          <div>
-            <div class="dispatch-timeline-plate" id="dispatch-plate"></div>
-            <div class="dispatch-timeline-driver" id="dispatch-driver"></div>
-          </div>
-          <button class="btn btn-secondary" id="dispatch-revert-btn" onclick="dispatchRevert()" disabled>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
-            <span data-l="en">Revert last action</span><span data-l="vi">Hoàn tác gần nhất</span>
-          </button>
+      <aside class="dd-left">
+        <div class="dd-panel-head">
+          <h4><span data-l="en">Vehicles</span><span data-l="vi">Xe</span></h4>
+          <span class="dd-count" id="dispatch-vcount"></span>
         </div>
-        <div class="dispatch-current" id="dispatch-current"></div>
-        <div class="dispatch-stop-list" id="dispatch-stops"></div>
-      </div>
+        <div class="dd-attn" id="dispatch-attn-strip"></div>
+        <div class="dd-scroll" id="dispatch-vehicles"></div>
+      </aside>
+
+      <main class="dd-center">
+        <svg id="dispatch-map" viewBox="0 0 900 460" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="dd-legend">
+          <span><i style="--c:#00e6c3"></i><span data-l="en">Running</span><span data-l="vi">Đang chạy</span></span>
+          <span><i style="--c:#ffd400"></i><span data-l="en">Stopped, engine on</span><span data-l="vi">Dừng, nổ máy</span></span>
+          <span><i style="--c:#ff3b30"></i><span data-l="en">Engine off</span><span data-l="vi">Tắt máy</span></span>
+          <span><i style="--c:#8b93a1"></i><span data-l="en">GPS stale</span><span data-l="vi">GPS cũ</span></span>
+        </div>
+        <div class="dd-map-note"><span data-l="en">Fictional street layout, for demo only</span><span data-l="vi">Sơ đồ đường hư cấu, chỉ phục vụ demo</span></div>
+        <div class="dd-vibar" id="dispatch-infobar"></div>
+      </main>
+
+      <aside class="dd-right">
+        <div class="dd-panel-head">
+          <h4>Timeline</h4>
+          <span class="dd-count" id="dispatch-stopcount"></span>
+        </div>
+        <div class="dd-current" id="dispatch-current"></div>
+        <div class="dd-scroll" id="dispatch-stops"></div>
+      </aside>
     </div>
   </div>
 
@@ -1493,50 +1625,230 @@ footer {
 </footer>
 
 <!-- ── Modals ────────────────────────────────────────────────────────── -->
-<div class="modal-backdrop" id="m1">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div>
-        <span class="project-index">01</span>
-        <h3 class="modal-title"><span data-l="en">Fleet Logistics Platform</span><span data-l="vi">Nền tảng điều vận đội xe</span></h3>
-      </div>
-      <button class="btn btn-secondary" onclick="closeModal()" style="color:var(--text);flex-shrink:0">✕</button>
+<!-- ── Case-study books: one <template> per book. First child = front cover
+     (.bc), then one <article> per page. Same three projects as the demos. ── -->
+<template id="book-p1">
+  <div class="bc">
+    <span class="bc-idx">01</span>
+    <div>
+      <p class="bc-kicker"><span data-l="en">Fleet Logistics Platform</span><span data-l="vi">Nền tảng điều vận đội xe</span></p>
+      <h4 class="bc-title"><span data-l="en">Truck Load Planner</span><span data-l="vi">Xếp hàng lên xe</span></h4>
+      <p class="bc-sub"><span data-l="en">3D bin packing for a working 36-truck fleet</span><span data-l="vi">Xếp hàng 3D cho đội xe 36 chiếc đang vận hành</span></p>
     </div>
-    <div class="modal-body">
-      <p class="modal-section-label"><span data-l="en">What it does</span><span data-l="vi">Chức năng</span></p>
-      <ul class="modal-bullets">
-        <li><span data-l="en">Built and deployed a seven-module dispatch platform, in daily use for a 36-truck fleet — GPS tracking, geofencing, delivery planning and proof-of-delivery photos across more than 130 REST endpoints.</span><span data-l="vi">Xây dựng và triển khai nền tảng điều vận 7 phân hệ, dùng hằng ngày cho đội xe tải 36 chiếc — theo dõi GPS, geofencing, lập kế hoạch giao hàng, ảnh xác nhận giao hàng — trên 130 REST endpoint.</span></li>
-        <li><span data-l="en">Added a 3D load-planning tool (bin packing with stacking rules and a door aisle) and a Google Sheets plan importer.</span><span data-l="vi">Bổ sung công cụ xếp hàng 3D (bin packing với quy tắc xếp tầng và lối cửa) cùng bộ nhập kế hoạch từ Google Sheets.</span></li>
-      </ul>
-      <p class="modal-section-label"><span data-l="en">Stack</span><span data-l="vi">Công nghệ</span></p>
-      <div class="tags" style="margin-bottom:28px">
-        <span class="tag">Python</span><span class="tag">Flask</span><span class="tag">SQLite</span><span class="tag">JavaScript</span><span class="tag">Leaflet</span><span class="tag">Three.js</span><span class="tag">pytest</span><span class="tag">Render</span>
-      </div>
-      <a class="btn btn-primary" href="https://github.com/KhoaNguyen01004/ThanhTrungApp" target="_blank" rel="noopener">github.com/KhoaNguyen01004/ThanhTrungApp</a>
-    </div>
+    <span class="bc-foot">Nguyễn Việt Anh Khoa</span>
   </div>
-</div>
-
-<div class="modal-backdrop" id="m3">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div>
-        <span class="project-index">02</span>
-        <h3 class="modal-title"><span data-l="en">Color-Sorting Robotic Arm Controller</span><span data-l="vi">Bộ điều khiển tay robot phân loại theo màu</span></h3>
-      </div>
-      <button class="btn btn-secondary" onclick="closeModal()" style="color:var(--text);flex-shrink:0">✕</button>
+  <article class="bp">
+    <img class="bp-img" src="images/project-loadplanner.jpg" alt="Packages loaded inside a truck's cargo box, 3D view">
+    <p class="bp-kicker"><span data-l="en">Overview</span><span data-l="vi">Tổng quan</span></p>
+    <h4 class="bp-title"><span data-l="en">Which truck, and where each box goes</span><span data-l="vi">Dùng xe nào, và mỗi kiện nằm ở đâu</span></h4>
+    <p><span data-l="en">A module of the fleet platform that picks the truck for a shipment and plans where every package sits inside it, in 3D, with a step-by-step loading order.</span><span data-l="vi">Một phân hệ của nền tảng điều vận: chọn xe cho lô hàng và tính vị trí của từng kiện bên trong thùng xe theo không gian 3D, kèm thứ tự xếp hàng từng bước.</span></p>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">The problem</span><span data-l="vi">Bài toán</span></p>
+    <h4 class="bp-title"><span data-l="en">A 3D puzzle with rules</span><span data-l="vi">Bài toán xếp hình 3D có luật</span></h4>
+    <p><span data-l="en">Every shipment mixes packages of different sizes and weights. Some can't carry anything on top, some only light loads, and every one still has to be reachable from a door.</span><span data-l="vi">Mỗi lô hàng gồm nhiều kiện khác nhau về kích thước và trọng lượng. Có kiện không được chồng gì lên trên, có kiện chỉ chịu được hàng nhẹ, và kiện nào cũng phải lấy ra được từ một cửa xe.</span></p>
+    <p><span data-l="en">The fleet runs trucks from 1.5 to 10 tonnes, so the first question is which truck — or how few trucks — a shipment needs.</span><span data-l="vi">Đội xe có xe từ 1,5 đến 10 tấn, nên câu hỏi đầu tiên là dùng xe nào — hoặc ít nhất bao nhiêu xe — cho lô hàng.</span></p>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">What I built</span><span data-l="vi">Những gì tôi xây dựng</span></p>
+    <h4 class="bp-title"><span data-l="en">From shipment list to loading order</span><span data-l="vi">Từ danh sách hàng đến thứ tự xếp</span></h4>
+    <ul class="bp-list">
+      <li><b><span data-l="en">Vehicle selection</span><span data-l="vi">Chọn xe</span></b> — <span data-l="en">tries the smallest truck that fits everything; if none does, fills the biggest trucks first so fewer are used.</span><span data-l="vi">thử xe nhỏ nhất chứa được toàn bộ; nếu không xe nào đủ, xếp đầy xe lớn trước để dùng ít xe hơn.</span></li>
+      <li><b><span data-l="en">Placement engine</span><span data-l="vi">Bộ máy xếp hàng</span></b> — <span data-l="en">scores every candidate position for each package.</span><span data-l="vi">chấm điểm từng vị trí ứng viên cho mỗi kiện.</span></li>
+      <li><b><span data-l="en">Stacking rules</span><span data-l="vi">Quy tắc xếp tầng</span></b> — <span data-l="en">none / light only / normal per package, with a hard 3-layer cap.</span><span data-l="vi">không / chỉ hàng nhẹ / bình thường cho từng kiện, giới hạn cứng 3 tầng.</span></li>
+      <li><b><span data-l="en">Door access</span><span data-l="vi">Lối cửa</span></b> — <span data-l="en">every package must slide out through the rear door, then the right or left side door.</span><span data-l="vi">mỗi kiện phải lấy ra được qua cửa sau, rồi đến cửa hông phải hoặc trái.</span></li>
+      <li><b><span data-l="en">Views</span><span data-l="vi">Góc nhìn</span></b> — <span data-l="en">3D plus top and rear 2D views, with a step-by-step loading animation.</span><span data-l="vi">3D cùng góc nhìn 2D từ trên và từ sau, kèm hoạt ảnh xếp hàng từng bước.</span></li>
+    </ul>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Under the hood</span><span data-l="vi">Bên trong hệ thống</span></p>
+    <h4 class="bp-title"><span data-l="en">Fifteen tries, keep the best</span><span data-l="vi">Thử mười lăm lần, giữ lần tốt nhất</span></h4>
+    <ul class="bp-list">
+      <li><span data-l="en">Non-stackable packages go first because they need floor space, then the widest ones.</span><span data-l="vi">Kiện không xếp chồng được đi trước vì cần sàn xe, sau đó đến kiện rộng nhất.</span></li>
+      <li><span data-l="en">Each arrange runs 5 package orderings × 3 scoring profiles = 15 full passes, and keeps the one that places the most packages.</span><span data-l="vi">Mỗi lần xếp chạy 5 thứ tự kiện × 3 bộ trọng số = 15 lượt đầy đủ, rồi giữ lượt xếp được nhiều kiện nhất.</span></li>
+      <li><span data-l="en">The score weighs contact area, finishing the current row, balance across the width, avoiding dead gaps, and low layers over tall towers.</span><span data-l="vi">Điểm gồm diện tích tiếp xúc, lấp đầy hàng hiện tại, cân bằng theo chiều ngang, tránh khe chết, và ưu tiên tầng thấp hơn cột cao.</span></li>
+      <li><span data-l="en">A stacked package needs at least 50% of its base supported, its centre over a package below, and heavier packages underneath.</span><span data-l="vi">Kiện xếp chồng phải được đỡ ít nhất 50% đáy, trọng tâm nằm trên kiện bên dưới, và kiện bên dưới phải nặng hơn.</span></li>
+    </ul>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Tech stack</span><span data-l="vi">Công nghệ</span></p>
+    <h4 class="bp-title"><span data-l="en">An engine in Python, a scene in Three.js</span><span data-l="vi">Bộ máy bằng Python, cảnh 3D bằng Three.js</span></h4>
+    <dl class="bp-stack">
+      <dt>Python · Flask</dt><dd><span data-l="en">the packing engine and its API</span><span data-l="vi">bộ máy xếp hàng và API</span></dd>
+      <dt>Three.js</dt><dd><span data-l="en">3D view and loading animation</span><span data-l="vi">góc nhìn 3D và hoạt ảnh xếp hàng</span></dd>
+      <dt>Canvas 2D</dt><dd><span data-l="en">top and rear views</span><span data-l="vi">góc nhìn từ trên và từ sau</span></dd>
+      <dt>SQLite</dt><dd><span data-l="en">shipments, packages and placements</span><span data-l="vi">lô hàng, kiện hàng và vị trí xếp</span></dd>
+      <dt>pytest</dt><dd><span data-l="en">39 tests for scoring, auto-arrange and routes</span><span data-l="vi">39 test cho chấm điểm, tự xếp và API</span></dd>
+      <dt>py3dbp</dt><dd><span data-l="en">an experimental second engine</span><span data-l="vi">bộ máy thứ hai đang thử nghiệm</span></dd>
+    </dl>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Outcome</span><span data-l="vi">Kết quả</span></p>
+    <h4 class="bp-title"><span data-l="en">Real trucks, real dimensions</span><span data-l="vi">Xe thật, kích thước thật</span></h4>
+    <div class="bp-stats">
+      <div><b>15</b><span data-l="en">passes per arrange</span><span data-l="vi">lượt mỗi lần xếp</span></div>
+      <div><b>3</b><span data-l="en">layer stacking cap</span><span data-l="vi">tầng tối đa</span></div>
+      <div><b>39</b><span data-l="en">planner tests</span><span data-l="vi">test cho phân hệ</span></div>
     </div>
-    <div class="modal-body">
-      <p class="modal-section-label"><span data-l="en">What it does</span><span data-l="vi">Chức năng</span></p>
-      <ul class="modal-bullets">
-        <li><span data-l="en">Built a FastAPI backend managing joint limits, the serial protocol and the sorting state machine for a 6-axis arm, with a simulation mode that runs the whole flow without hardware.</span><span data-l="vi">Xây dựng backend FastAPI quản lý giới hạn khớp, giao thức serial và máy trạng thái phân loại cho tay robot 6 trục, kèm chế độ mô phỏng chạy trọn luồng khi không có phần cứng.</span></li>
-        <li><span data-l="en">Built a React control panel with keyboard and slider control, live status updates and an emergency stop.</span><span data-l="vi">Xây dựng bảng điều khiển React với điều khiển bằng bàn phím và slider, cập nhật trạng thái trực tiếp và nút dừng khẩn cấp.</span></li>
-      </ul>
-      <p class="modal-section-label"><span data-l="en">Stack</span><span data-l="vi">Công nghệ</span></p>
-      <div class="tags" style="margin-bottom:28px">
-        <span class="tag">FastAPI</span><span class="tag">React (Vite)</span><span class="tag">OpenCV</span><span class="tag">pySerial</span><span class="tag">Arduino</span>
-      </div>
-      <a class="btn btn-primary" href="https://github.com/KhoaNguyen01004/color-sorting-robotic-arm-controller" target="_blank" rel="noopener">github.com/KhoaNguyen01004/color-sorting-robotic-arm-controller</a>
+    <div class="bp-links">
+      <a class="btn btn-primary" href="https://github.com/KhoaNguyen01004/ThanhTrungApp" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-secondary" href="#demo-panel-fleet" onclick="closeModal(true)"><span data-l="en">Try the load planner</span><span data-l="vi">Dùng thử xếp hàng</span></a>
+    </div>
+  </article>
+</template>
+
+<template id="book-p2">
+  <div class="bc">
+    <span class="bc-idx">02</span>
+    <div>
+      <p class="bc-kicker"><span data-l="en">Fleet Logistics Platform</span><span data-l="vi">Nền tảng điều vận đội xe</span></p>
+      <h4 class="bc-title"><span data-l="en">Dispatcher Board</span><span data-l="vi">Bảng điều phối</span></h4>
+      <p class="bc-sub"><span data-l="en">Where 36 trucks are, and which ones need help</span><span data-l="vi">36 xe đang ở đâu, và xe nào cần xử lý</span></p>
+    </div>
+    <span class="bc-foot">Nguyễn Việt Anh Khoa</span>
+  </div>
+  <article class="bp">
+    <img class="bp-img" src="images/project-fleet.jpg" alt="Dispatcher map preview — three trucks routed across districts">
+    <p class="bp-kicker"><span data-l="en">Overview</span><span data-l="vi">Tổng quan</span></p>
+    <h4 class="bp-title"><span data-l="en">The screen dispatchers live in</span><span data-l="vi">Màn hình điều phối viên dùng cả ngày</span></h4>
+    <p><span data-l="en">The part of the fleet platform dispatchers watch all day: every truck on a live map, each truck's stops as a timeline, and the ones that need attention pulled to the top.</span><span data-l="vi">Phần của nền tảng điều vận mà điều phối viên theo dõi cả ngày: mọi xe trên bản đồ trực tiếp, các điểm dừng của từng xe dạng timeline, và những xe cần chú ý được đưa lên đầu.</span></p>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">The problem</span><span data-l="vi">Bài toán</span></p>
+    <h4 class="bp-title"><span data-l="en">Four sources, no links between them</span><span data-l="vi">Bốn nguồn dữ liệu, không liên kết với nhau</span></h4>
+    <p><span data-l="en">At Thành Trung, the same truck plate lived in four separate places: vehicle records in an Excel file, the next day's plan in the manager's Google Sheet, delivery photos in each driver's group chat, and GPS on the tracking vendor's portal.</span><span data-l="vi">Tại Công ty Thành Trung, cùng một biển số xe nằm ở bốn nơi tách rời: hồ sơ xe trên tệp Excel, kế hoạch giao hàng ngày mai trên Google Sheet của quản lý, ảnh chứng từ trong nhóm chat của từng tài xế, và vị trí GPS trên cổng giám sát của nhà cung cấp thiết bị.</span></p>
+    <p><span data-l="en">None of them referenced the others, so a finished trip couldn't be looked up by machine, and knowing where a truck was meant calling the driver.</span><span data-l="vi">Không nguồn nào tham chiếu tới nguồn nào, nên một chuyến đã xong không tra lại được bằng máy, và muốn biết xe đang ở đâu thì phải gọi điện cho tài xế.</span></p>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">What I built</span><span data-l="vi">Những gì tôi xây dựng</span></p>
+    <h4 class="bp-title"><span data-l="en">Everything a stop needs, in one board</span><span data-l="vi">Mọi thứ cho một điểm dừng, trên một bảng</span></h4>
+    <ul class="bp-list">
+      <li><b><span data-l="en">Stop execution</span><span data-l="vi">Thực thi điểm dừng</span></b> — <span data-l="en">advance, skip or cancel with a reason, reorder live, undo from each stop's history.</span><span data-l="vi">xác nhận, bỏ qua hoặc hủy kèm lý do, đổi thứ tự trực tiếp, hoàn tác theo lịch sử từng điểm.</span></li>
+      <li><b><span data-l="en">Attention flags</span><span data-l="vi">Cờ cảnh báo</span></b> — <span data-l="en">stuck at a stop, GPS stale, stopped away from a stop, plus a No GPS filter.</span><span data-l="vi">kẹt tại điểm dừng, GPS cũ, dừng ngoài điểm giao, cùng bộ lọc Mất GPS.</span></li>
+      <li><b><span data-l="en">Current-stop card</span><span data-l="vi">Thẻ điểm hiện tại</span></b> — <span data-l="en">pinned, with click-to-call and road-aware ETA and distance.</span><span data-l="vi">ghim cố định, bấm để gọi, ETA và quãng đường theo đường thật.</span></li>
+      <li><b><span data-l="en">Proof of delivery</span><span data-l="vi">Xác nhận giao hàng</span></b> — <span data-l="en">single and batch photo upload with a gallery.</span><span data-l="vi">tải ảnh từng tấm hoặc hàng loạt, kèm thư viện ảnh.</span></li>
+      <li><b><span data-l="en">Map tools</span><span data-l="vi">Công cụ bản đồ</span></b> — <span data-l="en">follow a truck, click a stop to find it, a distance ruler, street-level imagery and three basemaps.</span><span data-l="vi">bám theo xe, bấm điểm dừng để định vị, thước đo khoảng cách, ảnh đường phố và ba loại nền bản đồ.</span></li>
+    </ul>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Under the hood</span><span data-l="vi">Bên trong hệ thống</span></p>
+    <h4 class="bp-title"><span data-l="en">Built for a dispatcher's whole shift</span><span data-l="vi">Thiết kế cho cả ca làm của điều phối viên</span></h4>
+    <ul class="bp-list">
+      <li><b><span data-l="en">Attention first.</span><span data-l="vi">Ưu tiên cảnh báo.</span></b> <span data-l="en">The board shows 36 trucks and refreshes every 12 seconds — nobody reads every row at that pace, so trucks with a problem come first, worst first.</span><span data-l="vi">Bảng hiển thị 36 xe và tự làm mới mỗi 12 giây — không ai đọc hết từng dòng ở nhịp đó, nên xe có vấn đề được đưa lên đầu, nặng nhất trước.</span></li>
+      <li><b><span data-l="en">Unknown is not zero.</span><span data-l="vi">Không xác định khác với 0.</span></b> <span data-l="en">"No signal" and "parked" are shown differently, so a truck that lost signal never looks like one standing still.</span><span data-l="vi">"Mất tín hiệu" và "đang đỗ" được hiển thị khác nhau, để xe mất tín hiệu không bao giờ trông giống xe đang đứng yên.</span></li>
+      <li><b><span data-l="en">Derived, not stored.</span><span data-l="vi">Suy ra, không lưu.</span></b> <span data-l="en">The current stop is computed rather than saved, because dispatchers reorder stops during the day.</span><span data-l="vi">Điểm dừng hiện tại được tính ra chứ không lưu thành cột, vì điều phối viên đổi thứ tự điểm dừng ngay trong ngày.</span></li>
+    </ul>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Tech stack</span><span data-l="vi">Công nghệ</span></p>
+    <h4 class="bp-title"><span data-l="en">Boring tools, on purpose</span><span data-l="vi">Công cụ quen thuộc, có chủ đích</span></h4>
+    <dl class="bp-stack">
+      <dt>Python · Flask</dt><dd><span data-l="en">the dispatch API</span><span data-l="vi">API điều phối</span></dd>
+      <dt>SQLite</dt><dd><span data-l="en">plans, stops and history in raw SQL</span><span data-l="vi">kế hoạch, điểm dừng và lịch sử bằng SQL thuần</span></dd>
+      <dt>JavaScript · Leaflet</dt><dd><span data-l="en">the board and live map, no build step</span><span data-l="vi">bảng điều phối và bản đồ, không cần build</span></dd>
+      <dt>TTAS</dt><dd><span data-l="en">live GPS from the trucks</span><span data-l="vi">GPS trực tiếp từ xe</span></dd>
+      <dt>OpenRouteService</dt><dd><span data-l="en">road-aware ETA and distance</span><span data-l="vi">ETA và quãng đường theo đường thật</span></dd>
+      <dt>Mapillary</dt><dd><span data-l="en">street-level imagery of a stop</span><span data-l="vi">ảnh đường phố tại điểm dừng</span></dd>
+      <dt>pytest · jsdom</dt><dd><span data-l="en">backend tests and drives of the real frontend</span><span data-l="vi">test backend và kịch bản chạy frontend thật</span></dd>
+    </dl>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Outcome</span><span data-l="vi">Kết quả</span></p>
+    <h4 class="bp-title"><span data-l="en">In use every working day</span><span data-l="vi">Được dùng mỗi ngày làm việc</span></h4>
+    <div class="bp-stats">
+      <div><b>36</b><span data-l="en">vehicles</span><span data-l="vi">xe</span></div>
+      <div><b>12s</b><span data-l="en">refresh</span><span data-l="vi">làm mới</span></div>
+      <div><b>130</b><span data-l="en">platform endpoints</span><span data-l="vi">endpoint toàn hệ thống</span></div>
+    </div>
+    <div class="bp-links">
+      <a class="btn btn-primary" href="https://github.com/KhoaNguyen01004/ThanhTrungApp" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-secondary" href="#demo-panel-dispatch" onclick="closeModal(true)"><span data-l="en">Try the dispatcher board</span><span data-l="vi">Dùng thử bảng điều phối</span></a>
+    </div>
+  </article>
+</template>
+
+<template id="book-p3">
+  <div class="bc">
+    <span class="bc-idx">03</span>
+    <div>
+      <p class="bc-kicker"><span data-l="en">Robotics · Hardware in the loop</span><span data-l="vi">Robotics · Kết nối phần cứng</span></p>
+      <h4 class="bc-title"><span data-l="en">Color-Sorting Robotic Arm</span><span data-l="vi">Tay robot phân loại màu</span></h4>
+      <p class="bc-sub"><span data-l="en">A FastAPI controller for a 6-axis arm</span><span data-l="vi">Bộ điều khiển FastAPI cho tay robot 6 trục</span></p>
+    </div>
+    <span class="bc-foot">Nguyễn Việt Anh Khoa</span>
+  </div>
+  <article class="bp">
+    <img class="bp-img" src="images/project-robot.jpg" alt="Robot arm simulation">
+    <p class="bp-kicker"><span data-l="en">Overview</span><span data-l="vi">Tổng quan</span></p>
+    <h4 class="bp-title"><span data-l="en">Color-Sorting Robotic Arm Controller</span><span data-l="vi">Bộ điều khiển tay robot phân loại theo màu</span></h4>
+    <p><span data-l="en">A FastAPI backend managing joint limits, the serial protocol and a sorting state machine for a 6-axis arm, with a React control panel and a simulation mode that runs the whole flow without hardware.</span><span data-l="vi">Backend FastAPI quản lý giới hạn khớp, giao thức serial và máy trạng thái phân loại cho tay robot 6 trục, kèm bảng điều khiển React và chế độ mô phỏng chạy trọn luồng khi không có phần cứng.</span></p>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">The problem</span><span data-l="vi">Bài toán</span></p>
+    <h4 class="bp-title"><span data-l="en">Six joints, one serial cable</span><span data-l="vi">Sáu khớp, một sợi cáp serial</span></h4>
+    <p><span data-l="en">A 6-axis arm has to pick up coloured blocks and drop each one in the right place.</span><span data-l="vi">Tay robot 6 trục phải gắp các khối màu và thả từng khối vào đúng chỗ.</span></p>
+    <p><span data-l="en">Every joint has hard limits, the hardware only speaks a serial protocol, and the arm isn't always on the desk while you're writing code.</span><span data-l="vi">Mỗi khớp có giới hạn cứng, phần cứng chỉ giao tiếp qua giao thức serial, và không phải lúc nào tay robot cũng nằm trên bàn khi đang viết code.</span></p>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">What I built</span><span data-l="vi">Những gì tôi xây dựng</span></p>
+    <h4 class="bp-title"><span data-l="en">A controller with a safety net</span><span data-l="vi">Bộ điều khiển có lưới an toàn</span></h4>
+    <ul class="bp-list">
+      <li><span data-l="en">A FastAPI backend that owns the joint limits, the serial protocol and the sorting state machine.</span><span data-l="vi">Backend FastAPI quản lý giới hạn khớp, giao thức serial và máy trạng thái phân loại.</span></li>
+      <li><span data-l="en">A simulation mode that runs the whole flow with no hardware attached.</span><span data-l="vi">Chế độ mô phỏng chạy trọn luồng khi không gắn phần cứng.</span></li>
+      <li><span data-l="en">A React control panel with keyboard and slider control, live status updates and an emergency stop.</span><span data-l="vi">Bảng điều khiển React với điều khiển bằng bàn phím và slider, cập nhật trạng thái trực tiếp và nút dừng khẩn cấp.</span></li>
+      <li><span data-l="en">OpenCV for reading block colour.</span><span data-l="vi">OpenCV để nhận diện màu khối.</span></li>
+    </ul>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Under the hood</span><span data-l="vi">Bên trong hệ thống</span></p>
+    <h4 class="bp-title"><span data-l="en">Every move goes through the limits</span><span data-l="vi">Mọi chuyển động đều qua giới hạn khớp</span></h4>
+    <p><span data-l="en">Each sort runs Grab → Lift → Move → Drop-off → Home, with every joint clamped to its range:</span><span data-l="vi">Mỗi lần phân loại chạy Gắp → Nâng → Di chuyển → Thả → Về gốc, với mọi khớp bị giới hạn trong khoảng cho phép:</span></p>
+    <table class="bp-table">
+      <tr><th>S0</th><td><span data-l="en">Base yaw</span><span data-l="vi">Xoay đế</span></td><td>0–360°</td></tr>
+      <tr><th>S1</th><td><span data-l="en">Shoulder pitch</span><span data-l="vi">Vai</span></td><td>0–180°</td></tr>
+      <tr><th>S2</th><td><span data-l="en">Elbow pitch</span><span data-l="vi">Khuỷu tay</span></td><td>0–270°</td></tr>
+      <tr><th>S3</th><td><span data-l="en">Wrist pitch</span><span data-l="vi">Cổ tay (gập)</span></td><td>0–150°</td></tr>
+      <tr><th>S4</th><td><span data-l="en">Wrist roll</span><span data-l="vi">Cổ tay (xoay)</span></td><td>0–180°</td></tr>
+      <tr><th>S5</th><td><span data-l="en">Gripper</span><span data-l="vi">Kẹp</span></td><td>25–70°</td></tr>
+    </table>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Tech stack</span><span data-l="vi">Công nghệ</span></p>
+    <h4 class="bp-title"><span data-l="en">Python in the middle, hardware at the edge</span><span data-l="vi">Python ở giữa, phần cứng ở rìa</span></h4>
+    <dl class="bp-stack">
+      <dt>FastAPI</dt><dd><span data-l="en">API, joint limits and the state machine</span><span data-l="vi">API, giới hạn khớp và máy trạng thái</span></dd>
+      <dt>React (Vite)</dt><dd><span data-l="en">the control panel</span><span data-l="vi">bảng điều khiển</span></dd>
+      <dt>OpenCV</dt><dd><span data-l="en">colour detection</span><span data-l="vi">nhận diện màu</span></dd>
+      <dt>pySerial</dt><dd><span data-l="en">talking to the arm</span><span data-l="vi">giao tiếp với tay robot</span></dd>
+      <dt>Arduino</dt><dd><span data-l="en">the microcontroller on the arm side</span><span data-l="vi">vi điều khiển phía tay robot</span></dd>
+    </dl>
+  </article>
+  <article class="bp">
+    <p class="bp-kicker"><span data-l="en">Outcome</span><span data-l="vi">Kết quả</span></p>
+    <h4 class="bp-title"><span data-l="en">Runs with or without the arm</span><span data-l="vi">Chạy được dù có hay không có tay robot</span></h4>
+    <div class="bp-stats">
+      <div><b>6</b><span data-l="en">axes</span><span data-l="vi">trục</span></div>
+      <div><b>5</b><span data-l="en">steps per sort</span><span data-l="vi">bước mỗi lần</span></div>
+      <div><b>1</b><span data-l="en">emergency stop</span><span data-l="vi">nút dừng khẩn cấp</span></div>
+    </div>
+    <div class="bp-links">
+      <a class="btn btn-primary" href="https://github.com/KhoaNguyen01004/color-sorting-robotic-arm-controller" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-secondary" href="#demo-panel-arm" onclick="closeModal(true)"><span data-l="en">Try the arm demo</span><span data-l="vi">Dùng thử tay robot</span></a>
+    </div>
+  </article>
+</template>
+
+<div class="modal-backdrop book-backdrop" id="book">
+  <div class="book-wrap" role="dialog" aria-modal="true" aria-label="Case study">
+    <button class="book-close" id="book-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="book" id="book-spread">
+      <div class="book-page book-left" id="book-left"></div>
+      <div class="book-page book-right" id="book-right"></div>
+    </div>
+    <div class="book-nav">
+      <span class="book-dots" id="book-dots"></span>
+      <span id="book-count"></span>
+      <span class="book-hint"><span data-l="en">Drag a page to turn it · ← →</span><span data-l="vi">Kéo trang để lật · ← →</span></span>
     </div>
   </div>
 </div>
@@ -1554,6 +1866,408 @@ window.addEventListener('scroll', () => {
   const pct = s.scrollTop / (s.scrollHeight - s.clientHeight);
   progress.style.transform = `scaleX(${pct})`;
 }, { passive: true });
+
+/* ─── SCROLL FX: reveal on enter, parallax relative to parent's centre ── */
+const revealIO = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); }
+}), { rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealIO.observe(el));
+
+const parallaxEls = [...document.querySelectorAll('[data-speed]')];
+const parallaxOn = matchMedia('(min-width: 861px) and (prefers-reduced-motion: no-preference)');
+let parallaxTick = false;
+function parallax() {
+  parallaxTick = false;
+  parallaxEls.forEach(el => {
+    if (!parallaxOn.matches) { el.style.translate = ''; return; }
+    const r = el.parentElement.getBoundingClientRect(); // parent: own rect would include the translate
+    el.style.translate = `0 ${((r.top + r.height / 2 - innerHeight / 2) * el.dataset.speed).toFixed(1)}px`;
+  });
+}
+addEventListener('scroll', () => { if (!parallaxTick) { parallaxTick = true; requestAnimationFrame(parallax); } }, { passive: true });
+parallaxOn.addEventListener('change', parallax);
+parallax();
+
+/* ─── BOOKSHELF — clone the three spines until each half of the track is at
+   least as wide as the shelf, so translateX(-50%) loops seamlessly. ──────── */
+const shelf = document.getElementById('shelf');
+const shelfTrack = document.getElementById('shelf-track');
+const shelfSet = [...shelfTrack.children];
+const noMotion = matchMedia('(prefers-reduced-motion: reduce)');
+function shelfBuild() {
+  shelfTrack.querySelectorAll('.spine-clone').forEach(c => c.remove());
+  if (noMotion.matches) return;
+  const setW = shelfSet.reduce((s, b) => s + (b.offsetParent ? b.offsetWidth + 14 : 0), 0);
+  if (!setW) return;
+  const setsPerHalf = Math.ceil(shelf.clientWidth / setW);
+  for (let i = 1; i < setsPerHalf * 2; i++) {
+    shelfSet.forEach(b => {
+      const c = b.cloneNode(true);
+      c.classList.add('spine-clone');
+      c.tabIndex = -1;
+      c.setAttribute('aria-hidden', 'true');
+      shelfTrack.append(c);
+    });
+  }
+  shelfTrack.style.setProperty('--dur', `${(setW * setsPerHalf / 45).toFixed(1)}s`); // ~45px/s
+}
+shelfTrack.addEventListener('click', e => {
+  const spine = e.target.closest('.spine');
+  if (spine) openBook(spine.dataset.book, spine);
+});
+addEventListener('resize', shelfBuild);
+noMotion.addEventListener('change', shelfBuild);
+shelfBuild();
+
+/* ─── CASE-STUDY BOOK ──────────────────────────────────────────────────────
+   Spread of two pages (one on phones). Everything that moves is a "leaf"
+   hinged on the spine: page turns (dragged or keyed), the cover opening, and
+   the book folding shut. The book flies out of / back into its spine. ──── */
+const bookEl = document.getElementById('book');
+const bookSpread = document.getElementById('book-spread');
+const bookL = document.getElementById('book-left');
+const bookR = document.getElementById('book-right');
+const bookWide = matchMedia('(min-width: 861px)');
+let bookPages = [], bookCover = null, bookSpine = null, bookAt = 0, bookBusy = false;
+const bookStep = () => bookWide.matches ? 2 : 1;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function bookPage(i) {
+  return bookPages[i] ? bookPages[i].cloneNode(true) : document.createElement('div');
+}
+function bookFace(cls, content) {
+  const f = document.createElement('div');
+  f.className = 'book-leaf-face ' + cls;
+  f.append(content);
+  return f;
+}
+function bookLeaf(cls, front, back, angle) {
+  const leaf = document.createElement('div');
+  leaf.className = 'book-leaf ' + cls;
+  leaf.append(front, back);
+  leaf.style.transition = 'none';
+  leaf.style.transform = `rotateY(${angle}deg)`;
+  bookSpread.append(leaf);
+  leaf.getBoundingClientRect();
+  leaf.style.transition = '';
+  return leaf;
+}
+// Rotate a leaf to `angle`; resolves after the transition (timer backs up
+// transitionend, which never fires if the tab stops painting mid-turn).
+function bookSwing(leaf, angle) {
+  return new Promise(res => {
+    let done = false;
+    const end = () => { if (!done) { done = true; res(); } };
+    leaf.addEventListener('transitionend', end, { once: true });
+    setTimeout(end, 850);
+    leaf.style.transform = `rotateY(${angle}deg)`;
+  });
+}
+function bookShow() {
+  const step = bookStep(), n = bookPages.length;
+  bookAt -= bookAt % step;
+  bookR.hidden = step === 1;
+  bookL.replaceChildren(bookPage(bookAt));
+  if (step === 2) bookR.replaceChildren(bookPage(bookAt + 1));
+  bookL.scrollTop = bookR.scrollTop = 0;
+  document.getElementById('book-count').textContent =
+    step === 2 ? `${bookAt + 1}–${Math.min(bookAt + 2, n)} / ${n}` : `${bookAt + 1} / ${n}`;
+  document.getElementById('book-dots').innerHTML =
+    Array.from({ length: Math.ceil(n / step) }, (_, i) => `<i class="${i === bookAt / step ? 'on' : ''}"></i>`).join('');
+}
+function coverFace() {
+  const f = bookFace('book-cover', bookCover.cloneNode(true));
+  return f;
+}
+// Map the page the closed book sits on (right page, or the only page on
+// phones) onto the spine's rectangle, as a transform on the whole spread.
+function bookSpineTransform() {
+  if (!bookSpine || !bookSpine.isConnected) return null;
+  const s = bookSpine.getBoundingClientRect();
+  if (!s.width) return null;
+  const page = bookWide.matches ? bookR : bookL;
+  const b = bookSpread.getBoundingClientRect(), r = page.getBoundingClientRect();
+  bookSpread.style.transformOrigin = `${r.left - b.left + r.width / 2}px ${r.top - b.top + r.height / 2}px`;
+  return `translate(${s.left + s.width / 2 - (r.left + r.width / 2)}px, ${s.top + s.height / 2 - (r.top + r.height / 2)}px) scale(${s.width / r.width}, ${s.height / r.height})`;
+}
+
+window.openBook = async function(id, spine) {
+  if (bookBusy) return;
+  const tpl = [...document.getElementById('book-' + id).content.children];
+  bookCover = tpl[0];
+  bookPages = tpl.slice(1).map((p, i) => {
+    const page = p.cloneNode(true);
+    page.insertAdjacentHTML('beforeend', `<span class="bp-num">${i + 1}</span>`);
+    return page;
+  });
+  bookSpine = spine || null;
+  bookEl.style.setProperty('--c', spine ? spine.style.getPropertyValue('--c') : '');
+  bookAt = 0;
+  openModal('book');
+  bookShow();
+  shelf.classList.add('paused');
+  document.getElementById('book-close').focus();
+  if (noMotion.matches) { peekStart(); return; }
+
+  bookBusy = true;
+  if (bookSpine) bookSpine.style.visibility = 'hidden';
+  bookL.style.visibility = bookWide.matches ? 'hidden' : '';
+  const leaf = bookLeaf('fwd', coverFace(), bookFace('flip ' + (bookWide.matches ? 'book-left' : ''), bookWide.matches ? bookPage(0) : document.createElement('div')), 0);
+  // 1) fly out of the spine
+  const t = bookSpineTransform();
+  if (t) {
+    bookSpread.style.transition = 'none';
+    bookSpread.style.transform = t;
+    bookSpread.getBoundingClientRect();
+    bookSpread.style.transition = 'transform .55s cubic-bezier(.2,.7,.2,1)';
+    bookSpread.style.transform = '';
+    await wait(560);
+  }
+  // 2) open the cover
+  await bookSwing(leaf, -180);
+  leaf.remove();
+  bookL.style.visibility = '';
+  bookSpread.style.transition = '';
+  bookBusy = false;
+  peekStart();
+};
+
+async function bookClose() {
+  peekStop();
+  bookBusy = true;
+  if (!noMotion.matches) {
+    // 1) fold shut: the left half (or the single page) swings over as the cover
+    const wide = bookWide.matches;
+    const leaf = bookLeaf('fwd', coverFace(), bookFace('flip ' + (wide ? 'book-left' : ''), wide ? bookPage(bookAt) : document.createElement('div')), -180);
+    if (wide) bookL.style.visibility = 'hidden';
+    await bookSwing(leaf, 0);
+    // 2) fly back into the spine while the backdrop fades
+    const t = bookSpineTransform();
+    bookSpread.style.transition = 'transform .5s cubic-bezier(.5,0,.75,0)';
+    if (t) bookSpread.style.transform = t;
+    bookEl.classList.add('fading');
+    await wait(480);
+    leaf.remove();
+  }
+  bookEl.classList.remove('fading');
+  bookSpread.style.transition = bookSpread.style.transform = '';
+  bookL.style.visibility = '';
+  if (bookSpine) bookSpine.style.visibility = '';
+  shelf.classList.remove('paused');
+  bookBusy = false;
+  closeModal(true);
+}
+
+/* Soft (paper) page turn. In "frame" coordinates — x measured from the spine
+   outward, y down — a page is the rect [0,W]×[0,H] and its free corner is C.
+   Dragging moves that corner to P. The fold line is the perpendicular
+   bisector of C–P: the part of the page on C's side (Q) is cut away to show
+   the page underneath, and redrawn reflected across the fold as the flap —
+   the back of the sheet, i.e. the next page. Turning backward is the same
+   geometry mapped onto the left page (x → W − x). */
+let softRaf = 0, peek = null, peekRaf = 0;
+function softDiv(cls, child) {
+  const d = document.createElement('div');
+  d.className = cls;
+  if (child) d.append(child);
+  return d;
+}
+function softCreate(dir, top) {
+  const target = dir > 0 ? bookR : bookL;
+  const W = target.offsetWidth, H = target.offsetHeight, to = bookAt + dir * 2;
+  const front = softDiv('book-page soft-front ' + (dir > 0 ? 'book-right' : 'book-left'), bookPage(dir > 0 ? bookAt + 1 : bookAt));
+  const flap = softDiv('book-page soft-flap ' + (dir > 0 ? 'book-left' : 'book-right'), bookPage(dir > 0 ? to : to + 1));
+  const flapBand = softDiv('soft-band');
+  const shadeBand = softDiv('soft-band');
+  flap.append(flapBand);
+  const shade = softDiv('soft-shade', shadeBand);
+  const box = softDiv('soft');
+  box.style.cssText = `left:${target.offsetLeft}px;width:${W}px;height:${H}px`;
+  box.append(shade, front, softDiv('soft-flapwrap', flap));
+  front.scrollTop = target.scrollTop;
+  target.replaceChildren(bookPage(dir > 0 ? to + 1 : to)); // the page that gets revealed
+  bookSpread.append(box);
+  const C = { x: W, y: top ? 0 : H };
+  const s = { dir, to, W, H, C, P: C, box, front, flap, flapBand, shade, shadeBand };
+  softRender(s, C);
+  return s;
+}
+function softClip(pts, f) { // Sutherland–Hodgman against one half-plane f(p) >= 0
+  const out = [];
+  pts.forEach((a, i) => {
+    const b = pts[(i + 1) % pts.length], fa = f(a), fb = f(b);
+    if (fa >= 0) out.push(a);
+    if ((fa >= 0) !== (fb >= 0)) { const t = fa / (fa - fb); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+  });
+  return out;
+}
+const softPoly = pts => pts.length < 3 ? 'polygon(0 0,0 0,0 0)'
+  : `polygon(${pts.map(p => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`).join(',')})`;
+function softBand(el, p, n, width) {
+  el.style.left = p[0] + 'px';
+  el.style.top = p[1] + 'px';
+  el.style.width = width + 'px';
+  el.style.transform = `rotate(${Math.atan2(n.y, n.x)}rad)`;
+}
+function softRender(s, P) {
+  const { W, H, C } = s;
+  // The sheet is bound at the spine: the corner can't get further from the
+  // spine end on its own edge than W, nor from the far end than the diagonal.
+  const lim = (A, r) => { const dx = P.x - A.x, dy = P.y - A.y, d = Math.hypot(dx, dy); if (d > r) P = { x: A.x + dx * r / d, y: A.y + dy * r / d }; };
+  lim({ x: 0, y: C.y }, W);
+  lim({ x: 0, y: H - C.y }, Math.hypot(W, H));
+  s.P = P;
+  const dx = C.x - P.x, dy = C.y - P.y, dist = Math.hypot(dx, dy);
+  const folded = dist > 0.5;
+  s.shade.hidden = s.flap.parentNode.hidden = !folded;
+  if (!folded) { s.front.style.clipPath = ''; return; }
+  const n = { x: dx / dist, y: dy / dist }, M = { x: (C.x + P.x) / 2, y: (C.y + P.y) / 2 };
+  const side = p => (p[0] - M.x) * n.x + (p[1] - M.y) * n.y;
+  const rect = [[0, 0], [W, 0], [W, H], [0, H]];
+  // frame → page-local
+  const back = s.dir < 0;
+  const T = p => back ? [W - p[0], p[1]] : p;
+  const Q = softClip(rect, side).map(T), K = softClip(rect, p => -side(p)).map(T);
+  const Ml = T([M.x, M.y]), nl = back ? { x: -n.x, y: n.y } : n;
+  s.front.style.clipPath = softPoly(K);
+  s.shade.style.clipPath = softPoly(Q);
+  // flap = reflect across the fold ∘ mirror x→W−x (content is the sheet's back)
+  const d = { x: -nl.y, y: nl.x };
+  const A00 = 2 * d.x * d.x - 1, A01 = 2 * d.x * d.y, A11 = 2 * d.y * d.y - 1;
+  const vx = W - Ml[0], vy = -Ml[1];
+  s.flap.style.transform = `matrix(${-A00},${-A01},${A01},${A11},${A00 * vx + A01 * vy + Ml[0]},${A01 * vx + A11 * vy + Ml[1]})`;
+  s.flap.style.clipPath = softPoly(Q.map(p => [W - p[0], p[1]]));
+  softBand(s.shadeBand, Ml, nl, Math.min(90, dist * 0.45));
+  softBand(s.flapBand, [W - Ml[0], Ml[1]], { x: -nl.x, y: nl.y }, Math.max(24, dist * 0.5));
+}
+// Tween the corner to `to`, lifting it slightly off the straight line like a
+// real sheet. A timer backs up rAF, which stalls if the tab stops painting.
+function softAnimate(s, to, ms) {
+  return new Promise(res => {
+    const from = { ...s.P }, t0 = performance.now(), sign = s.C.y === 0 ? 1 : -1;
+    const far = Math.abs(to.x - from.x) > s.W ? 1 : 0.3;
+    let done = false;
+    const at = t => {
+      const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      softRender(s, { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e + Math.sin(Math.PI * e) * s.H * 0.07 * sign * far });
+    };
+    const finish = () => { if (done) return; done = true; cancelAnimationFrame(softRaf); at(1); res(); };
+    const step = now => {
+      const t = Math.min(1, (now - t0) / ms);
+      if (t >= 1) return finish();
+      at(t);
+      softRaf = requestAnimationFrame(step);
+    };
+    softRaf = requestAnimationFrame(step);
+    setTimeout(finish, ms + 250);
+  });
+}
+async function softFinish(s, commit) {
+  bookBusy = true;
+  await softAnimate(s, commit ? { x: -s.W, y: s.C.y } : s.C, commit ? 700 : 380);
+  s.box.remove();
+  if (commit) bookAt = s.to;
+  bookShow();
+  bookBusy = false;
+  peekStart();
+}
+
+// Idle hint: the next page's top corner lifts and settles on its own.
+function peekStart() {
+  peekStop(false);
+  if (!bookWide.matches || activeModal !== bookEl || bookBusy || !bookCanTurn(1)) return;
+  peek = softCreate(1, true);
+  const t0 = performance.now();
+  const loop = now => {
+    if (!peek) return;
+    const r = noMotion.matches ? 28 : 26 + 14 * Math.sin((now - t0) / 380);
+    softRender(peek, { x: peek.W - r, y: r * 0.9 });
+    peekRaf = requestAnimationFrame(loop);
+  };
+  loop(t0);
+}
+function peekStop(restore = true) {
+  cancelAnimationFrame(peekRaf);
+  if (!peek) return;
+  peek.box.remove();
+  peek = null;
+  if (restore) bookShow();
+}
+// Take over the idle peek if it is the same turn, otherwise start a fresh one.
+function softBegin(dir, top) {
+  if (dir > 0 && top && peek) {
+    cancelAnimationFrame(peekRaf);
+    const s = peek;
+    peek = null;
+    return s;
+  }
+  peekStop();
+  return softCreate(dir, top);
+}
+function bookCanTurn(dir) {
+  const to = bookAt + dir * bookStep();
+  return to >= 0 && to < bookPages.length;
+}
+window.bookTurn = function(dir) {
+  if (bookBusy || !bookCanTurn(dir)) return;
+  if (bookStep() === 1 || noMotion.matches) {
+    bookAt += dir * bookStep();
+    bookShow();
+    bookL.style.setProperty('--dir', dir);
+    bookL.classList.remove('slide'); void bookL.offsetWidth; bookL.classList.add('slide');
+    return;
+  }
+  softFinish(softBegin(dir, true), true);
+};
+
+// Drag: the grabbed corner (top or bottom, whichever half you grab) follows
+// the pointer; release past the middle of the page to turn it. A click near
+// the peeking corner turns too. Phones: the page follows the finger instead.
+let bookDrag = null;
+bookSpread.addEventListener('pointerdown', e => {
+  if (bookBusy || e.button !== 0 || e.target.closest('a, button')) return;
+  bookDrag = { id: e.pointerId, x: e.clientX, y: e.clientY, dir: 0, s: null, rect: null };
+});
+addEventListener('pointermove', e => {
+  const d = bookDrag;
+  if (!d || e.pointerId !== d.id) return;
+  const dx = e.clientX - d.x;
+  if (!d.dir) {
+    if (Math.abs(dx) < 6) return;
+    const dir = dx < 0 ? 1 : -1;
+    if (!bookCanTurn(dir)) { bookDrag = null; return; }
+    d.dir = dir;
+    bookSpread.classList.add('dragging');
+    if (bookStep() === 2 && !noMotion.matches) {
+      d.rect = (dir > 0 ? bookR : bookL).getBoundingClientRect();
+      d.s = softBegin(dir, d.y - d.rect.top < d.rect.height / 2);
+    }
+  }
+  if (d.s) softRender(d.s, { x: d.s.dir > 0 ? e.clientX - d.rect.left : d.rect.right - e.clientX, y: e.clientY - d.rect.top });
+  else bookL.style.translate = `${dx}px 0`;
+});
+function bookDragEnd(e) {
+  const d = bookDrag;
+  if (!d || e.pointerId !== d.id) return;
+  bookDrag = null;
+  bookSpread.classList.remove('dragging');
+  if (!d.dir) {
+    const r = bookR.getBoundingClientRect();
+    if (bookStep() === 2 && r.right - e.clientX < 90 && e.clientY - r.top < 90) bookTurn(1);
+    return;
+  }
+  if (d.s) softFinish(d.s, d.s.P.x < d.s.W / 2);
+  else { bookL.style.translate = ''; if (Math.abs(e.clientX - d.x) > bookSpread.clientWidth * 0.3) bookTurn(d.dir); }
+}
+addEventListener('pointerup', bookDragEnd);
+addEventListener('pointercancel', bookDragEnd);
+
+bookWide.addEventListener('change', () => { if (activeModal === bookEl && !bookBusy) { peekStop(); bookShow(); peekStart(); } });
+addEventListener('keydown', e => {
+  if (activeModal !== bookEl) return;
+  if (e.key === 'ArrowRight') bookTurn(1);
+  if (e.key === 'ArrowLeft') bookTurn(-1);
+});
 
 /* ─── NAV ACTIVE ─────────────────────────────────────────────────────────── */
 const navIO = new IntersectionObserver(entries => {
@@ -1576,7 +2290,9 @@ function openModal(id) {
   el.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeModal() {
+function closeModal(instant) {
+  // The book plays its fold-shut animation first, then calls back with instant=true.
+  if (activeModal === bookEl && instant !== true) { if (!bookBusy) bookClose(); return; }
   if (activeModal) {
     activeModal.classList.remove('open');
     activeModal = null;
@@ -1612,6 +2328,7 @@ function setFilter(v) {
   document.querySelectorAll('[data-chip]').forEach(c => {
     c.classList.toggle('on', c.dataset.chip === v);
   });
+  if (typeof shelfBuild === 'function') shelfBuild();
 }
 
 /* ─── INIT ───────────────────────────────────────────────────────────────── */
@@ -2165,11 +2882,11 @@ const DISPATCH_VEHICLES = [
     planEn: 'Route 36 — District 7 morning loop', planVi: 'Tuyến 36 — Quận 7 buổi sáng',
     gpsAgoMin: 2,
     stops: [
-      { id: 'v1s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed', mapX: 140, mapY: 140 },
-      { id: 'v1s2', seq: 2, nameEn: 'Co.opmart — Nguyễn Thị Thập', nameVi: 'Co.opmart — Nguyễn Thị Thập', addressEn: '171 Nguyễn Thị Thập, Q7', addressVi: '171 Nguyễn Thị Thập, Q7', manager: 'Lê Thu Hà', phone: '090 552 7761', status: 'completed', mapX: 480, mapY: 90 },
-      { id: 'v1s3', seq: 3, nameEn: 'Bách Hóa Xanh — Lê Văn Lương', nameVi: 'Bách Hóa Xanh — Lê Văn Lương', addressEn: '452 Lê Văn Lương, Q7', addressVi: '452 Lê Văn Lương, Q7', manager: 'Trịnh Anh Tuấn', phone: '090 118 3390', status: 'arrived', arrivedAgoMin: 4, mapX: 560, mapY: 150 },
-      { id: 'v1s4', seq: 4, nameEn: 'Phú Mỹ Hưng convenience store', nameVi: 'Cửa hàng tiện lợi Phú Mỹ Hưng', addressEn: 'Hưng Vượng, Q7', addressVi: 'Hưng Vượng, Q7', manager: 'Đỗ Ngọc Mai', phone: '090 664 2015', status: 'planned', etaMin: 26, mapX: 640, mapY: 200 },
-      { id: 'v1s5', seq: 5, nameEn: 'Tân Thuận cold storage', nameVi: 'Kho lạnh Tân Thuận', addressEn: 'KCX Tân Thuận, Q7', addressVi: 'KCX Tân Thuận, Q7', manager: 'Vũ Đình Khang', phone: '090 887 5529', status: 'planned', etaMin: 52, mapX: 720, mapY: 110 },
+      { id: 'v1s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed', mapX: 160, mapY: 110 },
+      { id: 'v1s2', seq: 2, nameEn: 'Co.opmart — Nguyễn Thị Thập', nameVi: 'Co.opmart — Nguyễn Thị Thập', addressEn: '171 Nguyễn Thị Thập, Q7', addressVi: '171 Nguyễn Thị Thập, Q7', manager: 'Lê Thu Hà', phone: '090 552 7761', status: 'completed', mapX: 500, mapY: 60 },
+      { id: 'v1s3', seq: 3, nameEn: 'Bách Hóa Xanh — Lê Văn Lương', nameVi: 'Bách Hóa Xanh — Lê Văn Lương', addressEn: '452 Lê Văn Lương, Q7', addressVi: '452 Lê Văn Lương, Q7', manager: 'Trịnh Anh Tuấn', phone: '090 118 3390', status: 'arrived', arrivedAgoMin: 4, mapX: 600, mapY: 110 },
+      { id: 'v1s4', seq: 4, nameEn: 'Phú Mỹ Hưng convenience store', nameVi: 'Cửa hàng tiện lợi Phú Mỹ Hưng', addressEn: 'Hưng Vượng, Q7', addressVi: 'Hưng Vượng, Q7', manager: 'Đỗ Ngọc Mai', phone: '090 664 2015', status: 'planned', etaMin: 26, mapX: 700, mapY: 170 },
+      { id: 'v1s5', seq: 5, nameEn: 'Tân Thuận cold storage', nameVi: 'Kho lạnh Tân Thuận', addressEn: 'KCX Tân Thuận, Q7', addressVi: 'KCX Tân Thuận, Q7', manager: 'Vũ Đình Khang', phone: '090 887 5529', status: 'planned', etaMin: 52, mapX: 820, mapY: 80 },
     ],
   },
   {
@@ -2177,10 +2894,10 @@ const DISPATCH_VEHICLES = [
     planEn: 'Route 18 — Nhà Bè afternoon loop', planVi: 'Tuyến 18 — Nhà Bè buổi chiều',
     gpsAgoMin: 1,
     stops: [
-      { id: 'v2s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed', mapX: 140, mapY: 140 },
-      { id: 'v2s2', seq: 2, nameEn: 'Bình Điền wholesale market', nameVi: 'Chợ đầu mối Bình Điền', addressEn: 'QL50, Bình Điền', addressVi: 'QL50, Bình Điền', manager: 'Ngô Thanh Sơn', phone: '090 220 8817', status: 'arrived', arrivedAgoMin: 44, mapX: 140, mapY: 260 },
-      { id: 'v2s3', seq: 3, nameEn: 'Big C — Nhà Bè', nameVi: 'Siêu thị Big C Nhà Bè', addressEn: 'TL15, Nhà Bè', addressVi: 'TL15, Nhà Bè', manager: 'Huỳnh Gia Bảo', phone: '090 774 3361', status: 'planned', etaMin: 30, mapX: 520, mapY: 370 },
-      { id: 'v2s4', seq: 4, nameEn: 'Partner school — office-supplies drop', nameVi: 'Trường học liên kết — giao văn phòng phẩm', addressEn: 'Nhơn Đức, Nhà Bè', addressVi: 'Nhơn Đức, Nhà Bè', manager: 'Cô Hồng Nhung', phone: '090 405 9928', status: 'planned', etaMin: 58, mapX: 680, mapY: 390 },
+      { id: 'v2s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed', mapX: 160, mapY: 110 },
+      { id: 'v2s2', seq: 2, nameEn: 'Bình Điền wholesale market', nameVi: 'Chợ đầu mối Bình Điền', addressEn: 'QL50, Bình Điền', addressVi: 'QL50, Bình Điền', manager: 'Ngô Thanh Sơn', phone: '090 220 8817', status: 'arrived', arrivedAgoMin: 44, mapX: 160, mapY: 245 },
+      { id: 'v2s3', seq: 3, nameEn: 'Big C — Nhà Bè', nameVi: 'Siêu thị Big C Nhà Bè', addressEn: 'TL15, Nhà Bè', addressVi: 'TL15, Nhà Bè', manager: 'Huỳnh Gia Bảo', phone: '090 774 3361', status: 'planned', etaMin: 30, mapX: 540, mapY: 375 },
+      { id: 'v2s4', seq: 4, nameEn: 'Partner school — office-supplies drop', nameVi: 'Trường học liên kết — giao văn phòng phẩm', addressEn: 'Nhơn Đức, Nhà Bè', addressVi: 'Nhơn Đức, Nhà Bè', manager: 'Cô Hồng Nhung', phone: '090 405 9928', status: 'planned', etaMin: 58, mapX: 760, mapY: 405 },
     ],
   },
   {
@@ -2188,20 +2905,23 @@ const DISPATCH_VEHICLES = [
     planEn: 'Route 97 — District 8 morning loop', planVi: 'Tuyến 97 — Quận 8 buổi sáng',
     gpsAgoMin: 33,
     stops: [
-      { id: 'v3s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed', mapX: 140, mapY: 140 },
-      { id: 'v3s2', seq: 2, nameEn: 'An Lạc building-materials store', nameVi: 'Cửa hàng Vật liệu Xây dựng An Lạc', addressEn: 'An Lạc, Bình Tân', addressVi: 'An Lạc, Bình Tân', manager: 'Bùi Xuân Hòa', phone: '090 331 6674', status: 'skipped', reasonEn: 'Store closed for renovation', reasonVi: 'Cửa hàng đóng cửa sửa chữa', mapX: 110, mapY: 175 },
-      { id: 'v3s3', seq: 3, nameEn: 'Bách Hóa Xanh — Phạm Thế Hiển', nameVi: 'Bách Hóa Xanh — Phạm Thế Hiển', addressEn: '210 Phạm Thế Hiển, Q8', addressVi: '210 Phạm Thế Hiển, Q8', manager: 'Lý Thành Đạt', phone: '090 992 1147', status: 'arrived', arrivedAgoMin: 5, mapX: 230, mapY: 400 },
-      { id: 'v3s4', seq: 4, nameEn: 'District 8 distribution depot', nameVi: 'Kho phân phối Quận 8', addressEn: 'Phạm Hùng, Q8', addressVi: 'Phạm Hùng, Q8', manager: 'Đặng Việt Cường', phone: '090 556 8203', status: 'planned', etaMin: 20, mapX: 150, mapY: 370 },
+      { id: 'v3s1', seq: 1, nameEn: 'Central warehouse (Bình Tân)', nameVi: 'Kho tổng — Bình Tân', addressEn: '18 Hồ Học Lãm, Bình Tân', addressVi: '18 Hồ Học Lãm, Bình Tân', manager: 'Phạm Quốc Bảo', phone: '090 311 4482', status: 'completed', mapX: 160, mapY: 110 },
+      { id: 'v3s2', seq: 2, nameEn: 'An Lạc building-materials store', nameVi: 'Cửa hàng Vật liệu Xây dựng An Lạc', addressEn: 'An Lạc, Bình Tân', addressVi: 'An Lạc, Bình Tân', manager: 'Bùi Xuân Hòa', phone: '090 331 6674', status: 'skipped', reasonEn: 'Store closed for renovation', reasonVi: 'Cửa hàng đóng cửa sửa chữa', mapX: 90, mapY: 150 },
+      { id: 'v3s3', seq: 3, nameEn: 'Bách Hóa Xanh — Phạm Thế Hiển', nameVi: 'Bách Hóa Xanh — Phạm Thế Hiển', addressEn: '210 Phạm Thế Hiển, Q8', addressVi: '210 Phạm Thế Hiển, Q8', manager: 'Lý Thành Đạt', phone: '090 992 1147', status: 'arrived', arrivedAgoMin: 5, mapX: 280, mapY: 415 },
+      { id: 'v3s4', seq: 4, nameEn: 'District 8 distribution depot', nameVi: 'Kho phân phối Quận 8', addressEn: 'Phạm Hùng, Q8', addressVi: 'Phạm Hùng, Q8', manager: 'Đặng Việt Cường', phone: '090 556 8203', status: 'planned', etaMin: 20, mapX: 160, mapY: 385 },
     ],
   },
 ];
 
+/* Zones tile the full 900×460 canvas edge to edge — no dead space, no gaps
+   to misread as missing content. West column (Bình Tân/Bình Điền/Quận 8)
+   sits left of the x=420 district line, east column (Quận 7/Nhà Bè) right. */
 const DISPATCH_MAP_ZONES = [
-  { x: 50, y: 40, w: 260, h: 150, labelEn: 'Bình Tân', labelVi: 'Bình Tân' },
-  { x: 50, y: 210, w: 260, h: 90, labelEn: 'Bình Điền', labelVi: 'Bình Điền' },
-  { x: 50, y: 320, w: 260, h: 110, labelEn: 'Quận 8', labelVi: 'Quận 8' },
-  { x: 430, y: 40, w: 340, h: 260, labelEn: 'Quận 7', labelVi: 'Quận 7' },
-  { x: 430, y: 320, w: 340, h: 110, labelEn: 'Nhà Bè', labelVi: 'Nhà Bè' },
+  { x: 0, y: 0, w: 420, h: 190, labelEn: 'Bình Tân', labelVi: 'Bình Tân' },
+  { x: 0, y: 190, w: 420, h: 110, labelEn: 'Bình Điền', labelVi: 'Bình Điền' },
+  { x: 0, y: 300, w: 420, h: 160, labelEn: 'Quận 8', labelVi: 'Quận 8' },
+  { x: 420, y: 0, w: 480, h: 300, labelEn: 'Quận 7', labelVi: 'Quận 7' },
+  { x: 420, y: 300, w: 480, h: 160, labelEn: 'Nhà Bè', labelVi: 'Nhà Bè' },
 ];
 
 let _dispatchSelected = 'v1';
@@ -2222,12 +2942,12 @@ function dispatchFmtClock(ms) {
   return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 }
 function dispatchStatusBadge(status) {
-  return `<span class="dispatch-badge st-${status}">${DISPATCH_STATUS_LABEL[status][dispatchLang()]}</span>`;
+  return `<span class="dd-badge status-${status}">${DISPATCH_STATUS_LABEL[status][dispatchLang()]}</span>`;
 }
 function dispatchFlagLabel(f) {
   const vi = dispatchLang() === 'vi';
   const min = Math.round(f.ageMs / 60000);
-  if (f.type === 'stuck') return vi ? `Kẹt tại điểm ${min}ph` : `Stuck ${min}m`;
+  if (f.type === 'stuck') return vi ? `Kẹt tại điểm ${min}ph` : `Stuck ${min}m at stop`;
   return vi ? `GPS cũ ${min}ph` : `GPS stale ${min}m`;
 }
 function dispatchAttentionFlags(v) {
@@ -2256,91 +2976,123 @@ function dispatchProgress(v) {
   return { done, total: v.stops.length, pct: Math.round((done / v.stops.length) * 100) };
 }
 function dispatchSortedStops(v) { return [...v.stops].sort((a, b) => a.seq - b.seq); }
-function dispatchIsOpen(s) {
+// Like the real timeline: only the current stop starts expanded.
+function dispatchCurrentStop(v) { return dispatchSortedStops(v).find(s => !DISPATCH_TERMINAL.includes(s.status)); }
+function dispatchIsOpen(s, v) {
   if (_dispatchOpenOverride.has(s.id)) return _dispatchOpenOverride.get(s.id);
-  return !DISPATCH_TERMINAL.includes(s.status);
+  const cur = dispatchCurrentStop(v);
+  return !!cur && cur.id === s.id;
+}
+
+const dispatchEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function dispatchT(en, vi) { return dispatchLang() === 'vi' ? vi : en; }
+function dispatchSeverity(flags) {
+  return flags.some(f => f.severity === 'critical') ? 'sev-critical' : flags.length ? 'sev-warn' : '';
+}
+
+let _dispatchQuick = '';
+const DISPATCH_QUICK = [
+  { id: '', en: 'All', vi: 'Tất cả' },
+  { id: 'attention', en: 'Needs attention', vi: 'Cần chú ý' },
+  { id: 'executing', en: 'Executing', vi: 'Đang chạy' },
+];
+function dispatchVisibleVehicles() {
+  return DISPATCH_VEHICLES.filter(v => {
+    if (_dispatchQuick === 'attention') return dispatchAttentionFlags(v).length > 0;
+    if (_dispatchQuick === 'executing') return ['executing', 'arrived'].includes(dispatchOverallStatus(v));
+    return true;
+  });
+}
+window.dispatchSetQuick = function(id) { _dispatchQuick = id; dispatchRenderAll(); };
+
+function dispatchRenderQuick() {
+  document.getElementById('dispatch-quick').innerHTML = DISPATCH_QUICK.map(q =>
+    `<button class="dd-chip${q.id === _dispatchQuick ? ' active' : ''}" onclick="dispatchSetQuick('${q.id}')">${dispatchT(q.en, q.vi)}</button>`).join('');
 }
 
 function dispatchRenderAttnStrip() {
   const el = document.getElementById('dispatch-attn-strip');
-  if (!el) return;
   const flagged = DISPATCH_VEHICLES.map(v => ({ v, flags: dispatchAttentionFlags(v) })).filter(x => x.flags.length);
-  flagged.sort((a, b) => (b.flags.some(f => f.severity === 'critical') ? 1 : 0) - (a.flags.some(f => f.severity === 'critical') ? 1 : 0));
+  flagged.sort((a, b) => (dispatchSeverity(b.flags) === 'sev-critical') - (dispatchSeverity(a.flags) === 'sev-critical'));
   el.innerHTML = flagged.map(({ v, flags }) => `
-    <button class="dispatch-attn-chip${flags.some(f => f.severity === 'critical') ? ' critical' : ''}" onclick="dispatchSelectVehicle('${v.id}')">
-      <span class="dispatch-attn-dot"></span>${v.plate} — ${flags.map(dispatchFlagLabel).join(', ')}
+    <button class="dd-attn-chip ${dispatchSeverity(flags)}" onclick="dispatchSelectVehicle('${v.id}')">
+      <b>${v.plate}</b><span>${flags.map(dispatchFlagLabel).join(' · ')}</span>
     </button>`).join('');
 }
 
 function dispatchRenderVehicles() {
   const wrap = document.getElementById('dispatch-vehicles');
-  if (!wrap) return;
-  const lang = dispatchLang();
-  wrap.innerHTML = DISPATCH_VEHICLES.map(v => {
+  const list = dispatchVisibleVehicles();
+  document.getElementById('dispatch-vcount').textContent = list.length;
+  if (!list.length) { wrap.innerHTML = `<div class="dd-empty">${dispatchT('No vehicles match this filter', 'Không có xe nào khớp bộ lọc')}</div>`; return; }
+  wrap.innerHTML = list.map(v => {
     const overall = dispatchOverallStatus(v);
     const prog = dispatchProgress(v);
     const cur = dispatchSortedStops(v).find(s => !DISPATCH_TERMINAL.includes(s.status));
-    const flags = dispatchAttentionFlags(v);
+    const sev = dispatchSeverity(dispatchAttentionFlags(v));
     return `
-    <button class="dispatch-vehicle${v.id === _dispatchSelected ? ' on' : ''}" data-vehicle="${v.id}" onclick="dispatchSelectVehicle('${v.id}')">
-      <div class="dispatch-vehicle-top">
-        <span class="dispatch-vehicle-plate">${v.plate}</span>
+    <button class="dd-vcard${v.id === _dispatchSelected ? ' selected' : ''}" onclick="dispatchSelectVehicle('${v.id}')">
+      <div class="dd-vc-header">
+        <div>
+          <div class="dd-vc-row">${sev ? `<span class="dd-vc-dot ${sev}"></span>` : ''}<span class="dd-vc-plate">${v.plate}</span></div>
+          <div class="dd-vc-driver">${v.driver}</div>
+        </div>
         ${dispatchStatusBadge(overall)}
       </div>
-      <div class="dispatch-vehicle-driver">${v.driver}</div>
-      <div class="dispatch-vehicle-stop">${cur ? (lang === 'vi' ? cur.nameVi : cur.nameEn) : (lang === 'vi' ? 'Đã hoàn tất mọi điểm' : 'All stops complete')}</div>
-      <div class="dispatch-progress-track"><div class="dispatch-progress-fill" style="width:${prog.pct}%"></div></div>
-      <div class="dispatch-vehicle-meta">
-        <span>${prog.done}/${prog.total} ${lang === 'vi' ? 'điểm' : 'stops'}</span>
-        <span>GPS ${dispatchFmtAgo(v.gpsAt)}</span>
+      <div class="dd-vc-stop">${cur ? `#${cur.seq} ${dispatchT(cur.nameEn, cur.nameVi)}` : dispatchT('All stops complete', 'Đã hoàn tất mọi điểm')}</div>
+      <div class="dd-vc-progress">
+        <div class="dd-vc-bar"><div class="dd-vc-fill status-${overall}" style="width:${prog.pct}%"></div></div>
+        <span>${prog.done}/${prog.total}</span>
       </div>
-      ${flags.length ? `<div class="dispatch-vehicle-flags">${flags.map(f => `<span class="dispatch-badge" style="border-color:var(--accent);color:var(--accent)">${dispatchFlagLabel(f)}</span>`).join('')}</div>` : ''}
+      <div class="dd-vc-meta"><span>${dispatchT(v.planEn, v.planVi)}</span><span>GPS ${dispatchFmtAgo(v.gpsAt)}</span></div>
     </button>`;
   }).join('');
 }
 
-function dispatchStopRowHtml(v, s, idx, sorted) {
-  const lang = dispatchLang();
-  const open = dispatchIsOpen(s);
+function dispatchStopRowHtml(v, s, idx, sorted, curId) {
+  const open = dispatchIsOpen(s, v);
   const prev = sorted[idx - 1], next = sorted[idx + 1];
   const canMoveUp = s.status === 'planned' && prev && prev.status === 'planned';
   const canMoveDown = s.status === 'planned' && next && next.status === 'planned';
+  const cls = ['dd-tl-item', 'status-' + s.status];
+  if (s.id === curId) cls.push('current'); else if (s.status === 'completed') cls.push('completed');
+  if (open) cls.push('open');
 
-  const actions = [];
-  if (s.status === 'planned') {
-    actions.push(`<button class="btn btn-primary" onclick="event.stopPropagation();dispatchAdvance('${v.id}','${s.id}')"><span data-l="en">Advance</span><span data-l="vi">Xác nhận đến</span></button>`);
-    actions.push(`<button class="btn btn-secondary" onclick="event.stopPropagation();dispatchSkip('${v.id}','${s.id}')"><span data-l="en">Skip</span><span data-l="vi">Bỏ qua</span></button>`);
-    actions.push(`<button class="btn btn-secondary" onclick="event.stopPropagation();dispatchCancel('${v.id}','${s.id}')"><span data-l="en">Cancel</span><span data-l="vi">Hủy</span></button>`);
-  } else if (s.status === 'arrived') {
-    actions.push(`<button class="btn btn-primary" onclick="event.stopPropagation();dispatchAdvance('${v.id}','${s.id}')"><span data-l="en">Complete</span><span data-l="vi">Hoàn tất</span></button>`);
-    actions.push(`<button class="btn btn-secondary" onclick="event.stopPropagation();dispatchCancel('${v.id}','${s.id}')"><span data-l="en">Cancel</span><span data-l="vi">Hủy</span></button>`);
-  }
-
-  const detail = [
-    `<div><b>${lang === 'vi' ? 'Địa chỉ' : 'Address'}:</b> ${lang === 'vi' ? s.addressVi : s.addressEn}</div>`,
-    `<div><b>${lang === 'vi' ? 'Phụ trách' : 'Manager'}:</b> ${s.manager} · ${s.phone}</div>`,
+  const rows = [
+    [dispatchT('Status', 'Trạng thái'), DISPATCH_STATUS_LABEL[s.status][dispatchLang()]],
+    [dispatchT('Address', 'Địa chỉ'), dispatchT(s.addressEn, s.addressVi)],
+    [dispatchT('Manager', 'Phụ trách'), s.manager],
+    [dispatchT('Phone', 'Điện thoại'), s.phone],
   ];
-  if (s.status === 'planned') detail.push(`<div><b>ETA:</b> ${dispatchFmtClock(s.etaAt)}</div>`);
-  if (s.status === 'arrived') detail.push(`<div><b>${lang === 'vi' ? 'Đến lúc' : 'Arrived'}:</b> ${dispatchFmtClock(s.arrivedAt)} (${dispatchFmtAgo(s.arrivedAt)})</div>`);
-  if (s.status === 'completed' && s.completedAt) detail.push(`<div><b>${lang === 'vi' ? 'Hoàn tất lúc' : 'Completed'}:</b> ${dispatchFmtClock(s.completedAt)}</div>`);
-  const reason = s.reasonEn ? `<div class="dispatch-stop-reason">${lang === 'vi' ? 'Lý do' : 'Reason'}: ${lang === 'vi' ? s.reasonVi : s.reasonEn}</div>` : '';
+  if (s.status === 'planned') rows.push(['ETA', dispatchFmtClock(s.etaAt)]);
+  if (s.status === 'arrived') rows.push([dispatchT('Arrival', 'Đến lúc'), `${dispatchFmtClock(s.arrivedAt)} (${dispatchFmtAgo(s.arrivedAt)})`]);
+  if (s.status === 'completed' && s.completedAt) rows.push([dispatchT('Departure', 'Rời lúc'), dispatchFmtClock(s.completedAt)]);
+  if (s.reasonEn) rows.push([dispatchT('Reason', 'Lý do'), dispatchEsc(dispatchT(s.reasonEn, s.reasonVi))]);
+
+  const act = (fn, cls, en, vi) => `<button class="dd-btn${cls}" onclick="event.stopPropagation();${fn}">${dispatchT(en, vi)}</button>`;
+  const actions = [];
+  if (s.status === 'planned' || s.status === 'arrived') {
+    actions.push(act(`dispatchAdvance('${v.id}','${s.id}')`, '', 'Advance', s.status === 'planned' ? 'Xác nhận đến' : 'Hoàn tất'));
+    if (s.status === 'planned') actions.push(act(`dispatchSkip('${v.id}','${s.id}')`, '', 'Skip', 'Bỏ qua'));
+    actions.push(act(`dispatchCancel('${v.id}','${s.id}')`, ' danger', 'Cancel', 'Hủy'));
+  }
+  if (v.lastAction && v.lastAction.stopId === s.id) actions.push(act('dispatchRevert()', ' revert', '↩ Revert', '↩ Hoàn tác'));
 
   return `
-  <div class="dispatch-stop${open ? ' open' : ''}" data-stop="${s.id}">
-    <div class="dispatch-stop-head" onclick="dispatchToggleStop('${s.id}')">
-      <span class="dispatch-stop-seq">${s.seq}</span>
-      <span class="dispatch-stop-name">${lang === 'vi' ? s.nameVi : s.nameEn}</span>
+  <div class="${cls.join(' ')}">
+    <div class="dd-tl-head" onclick="dispatchToggleStop('${s.id}')">
+      <span class="dd-tl-seq">${s.seq}</span>
+      <span class="dd-tl-station">${dispatchT(s.nameEn, s.nameVi)}</span>
       ${dispatchStatusBadge(s.status)}
-      <span class="dispatch-move-btns">
-        <button class="dispatch-move-btn" ${canMoveUp ? '' : 'disabled'} onclick="event.stopPropagation();dispatchMove('${v.id}','${s.id}',-1)" aria-label="Move up">▲</button>
-        <button class="dispatch-move-btn" ${canMoveDown ? '' : 'disabled'} onclick="event.stopPropagation();dispatchMove('${v.id}','${s.id}',1)" aria-label="Move down">▼</button>
+      <span class="dd-tl-move">
+        <button ${canMoveUp ? '' : 'disabled'} onclick="event.stopPropagation();dispatchMove('${v.id}','${s.id}',-1)" aria-label="Move stop earlier">▲</button>
+        <button ${canMoveDown ? '' : 'disabled'} onclick="event.stopPropagation();dispatchMove('${v.id}','${s.id}',1)" aria-label="Move stop later">▼</button>
       </span>
-      <span class="dispatch-stop-chevron">▾</span>
+      <span class="dd-tl-chev">▼</span>
     </div>
-    <div class="dispatch-stop-body" ${open ? '' : 'hidden'}>
-      <div class="dispatch-stop-detail">${detail.join('')}</div>
-      ${reason}
-      ${actions.length ? `<div class="dispatch-stop-actions">${actions.join('')}</div>` : ''}
+    <div class="dd-tl-body">
+      <dl class="dd-tl-detail">${rows.map(([k, val]) => `<dt>${k}:</dt><dd>${val}</dd>`).join('')}</dl>
+      ${actions.length ? `<div class="dd-tl-actions">${actions.join('')}</div>` : ''}
     </div>
   </div>`;
 }
@@ -2348,35 +3100,35 @@ function dispatchStopRowHtml(v, s, idx, sorted) {
 function dispatchRenderTimeline() {
   const v = DISPATCH_VEHICLES.find(x => x.id === _dispatchSelected);
   if (!v) return;
-  const lang = dispatchLang();
-  document.getElementById('dispatch-plate').textContent = v.plate;
-  document.getElementById('dispatch-driver').textContent = `${v.driver} — ${lang === 'vi' ? v.planVi : v.planEn}`;
-  document.getElementById('dispatch-revert-btn').disabled = !v.lastAction;
-
   const sorted = dispatchSortedStops(v);
+  const prog = dispatchProgress(v);
   const cur = sorted.find(s => !DISPATCH_TERMINAL.includes(s.status));
-  const curEl = document.getElementById('dispatch-current');
-  if (!cur) {
-    curEl.style.cursor = 'default';
-    curEl.onclick = null;
-    curEl.innerHTML = `
-      <div class="dispatch-current-label">${lang === 'vi' ? 'ĐIỂM HIỆN TẠI' : 'CURRENT STOP'}</div>
-      <div class="dispatch-current-name">${lang === 'vi' ? 'Đã hoàn tất mọi điểm dừng' : 'All stops complete'}</div>`;
-  } else {
-    curEl.style.cursor = 'pointer';
-    curEl.onclick = () => dispatchToggleStop(cur.id);
-    curEl.innerHTML = `
-      <div class="dispatch-current-label">${lang === 'vi' ? 'ĐIỂM HIỆN TẠI' : 'CURRENT STOP'}</div>
-      <div class="dispatch-current-name">#${cur.seq} ${lang === 'vi' ? cur.nameVi : cur.nameEn} ${dispatchStatusBadge(cur.status)}</div>
-      <div class="dispatch-current-addr">${lang === 'vi' ? cur.addressVi : cur.addressEn}</div>
-      <div class="dispatch-current-row">
-        <span>${cur.manager}</span>
-        <span>${cur.phone}</span>
-        <span>${cur.status === 'planned' ? 'ETA ' + dispatchFmtClock(cur.etaAt) : (lang === 'vi' ? 'đến lúc ' : 'arrived ') + dispatchFmtAgo(cur.arrivedAt)}</span>
-      </div>`;
-  }
+  document.getElementById('dispatch-stopcount').textContent = `${prog.done}/${prog.total}`;
 
-  document.getElementById('dispatch-stops').innerHTML = sorted.map((s, i) => dispatchStopRowHtml(v, s, i, sorted)).join('');
+  const curEl = document.getElementById('dispatch-current');
+  curEl.onclick = cur ? () => dispatchToggleStop(cur.id) : null;
+  curEl.style.cursor = cur ? 'pointer' : 'default';
+  curEl.innerHTML = !cur
+    ? `<div class="dd-cs-head"><span class="dd-cs-label">${dispatchT('Current Stop', 'Điểm hiện tại')}</span>${dispatchStatusBadge('completed')}</div>
+       <div class="dd-cs-station">${dispatchT('All stops complete', 'Đã hoàn tất mọi điểm dừng')}</div>`
+    : `<div class="dd-cs-head"><span class="dd-cs-label">${dispatchT('Current Stop', 'Điểm hiện tại')}</span>${dispatchStatusBadge(cur.status)}</div>
+       <div class="dd-cs-station">#${cur.seq} ${dispatchT(cur.nameEn, cur.nameVi)}</div>
+       <div class="dd-cs-detail">
+         <span>${dispatchT(cur.addressEn, cur.addressVi)}</span>
+         <span>${cur.manager} · <a href="#" onclick="event.preventDefault()">${cur.phone}</a></span>
+         <span>${cur.status === 'planned' ? `ETA <b>${dispatchFmtClock(cur.etaAt)}</b>` : `${dispatchT('Arrived', 'Đến lúc')} <b>${dispatchFmtAgo(cur.arrivedAt)}</b>`}</span>
+       </div>`;
+
+  document.getElementById('dispatch-stops').innerHTML = sorted.map((s, i) => dispatchStopRowHtml(v, s, i, sorted, cur && cur.id)).join('');
+}
+
+function dispatchRenderInfobar() {
+  const v = DISPATCH_VEHICLES.find(x => x.id === _dispatchSelected);
+  if (!v) return;
+  const prog = dispatchProgress(v);
+  document.getElementById('dispatch-infobar').innerHTML = `
+    <div class="dd-vibar-left"><b>${v.plate}</b><span>${v.driver}</span>${dispatchStatusBadge(dispatchOverallStatus(v))}</div>
+    <div class="dd-vibar-right"><span>${prog.done}/${prog.total} ${dispatchT('stops', 'điểm')}</span><span>GPS ${dispatchFmtAgo(v.gpsAt)}</span></div>`;
 }
 
 /* ─── DISPATCH MAP — schematic layout, straight route lines (same
@@ -2408,53 +3160,104 @@ function dispatchMapSegment(v) {
   const frac = Math.min(1, Math.max(0, (Date.now() - track.startedAt) / DISPATCH_MAP_TRAVEL_MS));
   return { from, to: cur, state: 'moving', frac };
 }
+/* Routes are drawn as right-angle "street" segments (horizontal leg then
+   vertical leg) instead of diagonal as-the-crow-flies lines, so they read
+   as a route following streets rather than lines cutting across the map.
+   The moving vehicle marker walks the same bent path so it never drifts
+   off the line it's supposedly driving. */
+function dispatchMapBend(from, to) {
+  if (from.mapX === to.mapX || from.mapY === to.mapY) return null;
+  return { x: to.mapX, y: from.mapY };
+}
+function dispatchMapOrthoPoints(sorted) {
+  const pts = [`${sorted[0].mapX},${sorted[0].mapY}`];
+  for (let i = 1; i < sorted.length; i++) {
+    const a = sorted[i - 1], b = sorted[i];
+    const bend = dispatchMapBend(a, b);
+    if (bend) pts.push(`${bend.x},${bend.y}`);
+    pts.push(`${b.mapX},${b.mapY}`);
+  }
+  return pts.join(' ');
+}
+function dispatchMapPathPoint(from, to, frac) {
+  const bend = dispatchMapBend(from, to);
+  if (!bend) {
+    return { x: from.mapX + (to.mapX - from.mapX) * frac, y: from.mapY + (to.mapY - from.mapY) * frac, dx: to.mapX - from.mapX, dy: to.mapY - from.mapY };
+  }
+  const len1 = Math.hypot(bend.x - from.mapX, bend.y - from.mapY);
+  const len2 = Math.hypot(to.mapX - bend.x, to.mapY - bend.y);
+  const d = frac * (len1 + len2 || 1);
+  if (d <= len1) {
+    const t = len1 ? d / len1 : 0;
+    return { x: from.mapX + (bend.x - from.mapX) * t, y: from.mapY + (bend.y - from.mapY) * t, dx: bend.x - from.mapX, dy: bend.y - from.mapY };
+  }
+  const t2 = len2 ? (d - len1) / len2 : 0;
+  return { x: bend.x + (to.mapX - bend.x) * t2, y: bend.y + (to.mapY - bend.y) * t2, dx: to.mapX - bend.x, dy: to.mapY - bend.y };
+}
 function dispatchMapPosition(v) {
   const { from, to, state, frac } = dispatchMapSegment(v);
-  const x = from.mapX + (to.mapX - from.mapX) * frac;
-  const y = from.mapY + (to.mapY - from.mapY) * frac;
-  let angle = 0;
-  if (to.mapX !== from.mapX || to.mapY !== from.mapY) {
-    angle = Math.atan2(to.mapX - from.mapX, -(to.mapY - from.mapY)) * 180 / Math.PI;
-  }
-  return { x, y, angle, state };
+  const p = dispatchMapPathPoint(from, to, frac);
+  const angle = (p.dx || p.dy) ? Math.atan2(p.dx, -p.dy) * 180 / Math.PI : 0;
+  return { x: p.x, y: p.y, angle, state };
 }
-function dispatchMapZonesSvg() {
-  const lang = dispatchLang();
-  return DISPATCH_MAP_ZONES.map(z => `
-    <rect class="dispatch-map-zone" x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="6"/>
-    <text class="dispatch-map-zone-label" x="${z.x + 12}" y="${z.y + 22}">${lang === 'vi' ? z.labelVi : z.labelEn}</text>`).join('');
+/* Streets run through every stop's x and y, so the right-angle routes always
+   sit on a road. Drawn past the 900×460 viewBox so the letterboxed edges of a
+   wide or tall map column still show streets instead of blank bands. */
+function dispatchMapBaseSvg() {
+  const xs = new Set(), ys = new Set();
+  DISPATCH_VEHICLES.forEach(v => v.stops.forEach(s => { xs.add(s.mapX); ys.add(s.mapY); }));
+  const lines = [...ys].map(y => `M-700 ${y}H1600`).concat([...xs].map(x => `M${x} -700V1160`)).join('');
+  const zones = DISPATCH_MAP_ZONES.map(z => `
+    <rect class="dd-map-zone" x="${z.x + 6}" y="${z.y + 6}" width="${z.w - 12}" height="${z.h - 12}" rx="6"/>
+    <text class="dd-map-zone-label" x="${z.x + 18}" y="${z.y + 30}">${dispatchT(z.labelEn, z.labelVi)}</text>`).join('');
+  return `
+    <defs><pattern id="dd-minor" width="45" height="45" patternUnits="userSpaceOnUse"><path class="dd-map-minor" d="M45 0H0V45"/></pattern></defs>
+    <rect class="dd-map-bg" x="-700" y="-700" width="2300" height="1860"/>
+    <rect x="-700" y="-700" width="2300" height="1860" fill="url(#dd-minor)"/>
+    ${zones}
+    <path class="dd-map-river" d="M455 -700 L455 -60 C430 80 492 160 452 262 S428 420 468 560 L468 1160"/>
+    <path class="dd-map-road" d="${lines}"/>
+    <path class="dd-map-road-in" d="${lines}"/>`;
 }
 function dispatchMapRouteStopsSvg(v) {
-  const lang = dispatchLang();
-  const on = v.id === _dispatchSelected;
+  const on = v.id === _dispatchSelected ? ' on' : '';
   const sorted = dispatchSortedStops(v);
-  let html = `<polyline class="dispatch-map-route${on ? ' on' : ''}" points="${sorted.map(s => `${s.mapX},${s.mapY}`).join(' ')}"/>`;
+  const cur = sorted.find(s => !DISPATCH_TERMINAL.includes(s.status));
+  const color = { completed: '#10b981', arrived: '#fb923c', planned: '#9ca3af', skipped: '#eab308', cancelled: '#f87171' };
+  let html = `<polyline class="dd-route${on}" points="${dispatchMapOrthoPoints(sorted)}"/>`;
   sorted.forEach(s => {
-    html += `<circle class="dispatch-map-stop${on ? ' on' : ''}" cx="${s.mapX}" cy="${s.mapY}" r="${on ? 7 : 4}"><title>${v.plate} — #${s.seq} ${lang === 'vi' ? s.nameVi : s.nameEn}</title></circle>`;
-    if (on) html += `<text class="dispatch-map-stop-num" x="${s.mapX}" y="${s.mapY + 3}">${s.seq}</text>`;
+    const isCur = cur && s.id === cur.id;
+    const r = isCur ? 9 : 7;
+    html += `<circle class="dd-stop${on}" cx="${s.mapX}" cy="${s.mapY}" r="${r}" fill="${isCur ? '#fb923c' : color[s.status]}"><title>${v.plate} — #${s.seq} ${dispatchT(s.nameEn, s.nameVi)}</title></circle>
+      <circle class="dd-stop-ring${on}" cx="${s.mapX}" cy="${s.mapY}" r="${r + 1.5}"/>`;
   });
   return html;
 }
+/* Same arrow + plate chip as map.js: arrow fill = live telemetry colour,
+   chip border = orange when selected, grey otherwise. */
 function dispatchMapVehicleSvg(v) {
   const on = v.id === _dispatchSelected;
   const pos = dispatchMapPosition(v);
-  const label = on ? `<text class="dispatch-map-vehicle-label" x="11" y="4">${v.plate}</text>` : '';
+  const stale = dispatchAttentionFlags(v).some(f => f.type === 'gpsStale');
+  const tele = stale ? '#8b93a1' : { moving: '#00e6c3', arrived: '#ffd400', done: '#ff3b30' }[pos.state];
+  const w = Math.round(v.plate.length * 6.4 + 14);
   return `
-  <g class="dispatch-map-vehicle${on ? ' on' : ''} state-${pos.state}" id="dispatch-map-vehicle-${v.id}" onclick="dispatchSelectVehicle('${v.id}')">
+  <g class="dd-veh state-${pos.state}" id="dispatch-map-vehicle-${v.id}" onclick="dispatchSelectVehicle('${v.id}')">
     <g class="dmv-pos" transform="translate(${pos.x},${pos.y})">
-      <circle class="dispatch-map-vehicle-halo" cx="0" cy="0" r="9"/>
-      <g class="dmv-rot" transform="rotate(${pos.angle})"><path class="dispatch-map-vehicle-tri" d="M0,-8 L6,7 L-6,7 Z"/></g>
-      ${label}
+      <circle class="dd-veh-halo" r="10" stroke="${tele}"/>
+      <g class="dmv-rot" transform="rotate(${pos.angle})"><g transform="translate(-11,-11)">
+        <path d="M11 1 L19 20 L11 15.5 L3 20 Z" fill="#fff" stroke="#0b0f14" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M11 4.2 L16.6 17.3 L11 13.6 L5.4 17.3 Z" fill="${tele}"/>
+      </g></g>
+      <rect class="dd-veh-label" x="14" y="-10" width="${w}" height="20" rx="4" stroke="${on ? '#fb923c' : '#9ca3af'}"/>
+      <text class="dd-veh-text" x="${14 + w / 2}" y="4">${v.plate}</text>
     </g>
   </g>`;
 }
 function dispatchRenderMap() {
   const svg = document.getElementById('dispatch-map');
-  if (!svg) return;
-  const order = [...DISPATCH_VEHICLES].sort((a, b) => (a.id === _dispatchSelected ? 1 : 0) - (b.id === _dispatchSelected ? 1 : 0));
-  svg.innerHTML = `
-    <rect class="dispatch-map-river" x="335" y="20" width="70" height="420" rx="14"/>
-    ${dispatchMapZonesSvg()}
+  const order = [...DISPATCH_VEHICLES].sort((a, b) => (a.id === _dispatchSelected) - (b.id === _dispatchSelected));
+  svg.innerHTML = `${dispatchMapBaseSvg()}
     <g>${order.map(dispatchMapRouteStopsSvg).join('')}</g>
     <g>${order.map(dispatchMapVehicleSvg).join('')}</g>`;
 }
@@ -2472,9 +3275,13 @@ function dispatchAnimateMap() {
 }
 
 function dispatchRenderAll() {
+  const visible = dispatchVisibleVehicles();
+  if (visible.length && !visible.some(v => v.id === _dispatchSelected)) _dispatchSelected = visible[0].id;
+  dispatchRenderQuick();
   dispatchRenderAttnStrip();
   dispatchRenderVehicles();
   dispatchRenderTimeline();
+  dispatchRenderInfobar();
   dispatchRenderMap();
 }
 
@@ -2486,7 +3293,7 @@ window.dispatchToggleStop = function(id) {
   const v = DISPATCH_VEHICLES.find(x => x.id === _dispatchSelected);
   const s = v && v.stops.find(x => x.id === id);
   if (!s) return;
-  _dispatchOpenOverride.set(id, !dispatchIsOpen(s));
+  _dispatchOpenOverride.set(id, !dispatchIsOpen(s, v));
   dispatchRenderTimeline();
 };
 window.dispatchAdvance = function(vid, sid) {
