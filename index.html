@@ -142,6 +142,14 @@ a:hover { text-decoration-color: var(--accent); }
 @media (prefers-reduced-transparency: reduce) {
   .glass { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+/* Phones: a blur is recomputed every frame something moves beneath it, so
+   use a smaller radius, and over the live 3D canvases a plain tinted fill. */
+@media (pointer: coarse) {
+  .glass { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .scene-wrap .glass, .arm-scene-wrap .glass {
+    -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(28,28,30,.82);
+  }
+}
 
 /* ─── NAVIGATION: a floating glass capsule. At the top of the page it is
    bare text over the hero; it materialises as content starts to pass under
@@ -2134,6 +2142,25 @@ function toggleTheme() {
   document.body.dataset.lang            = lang;
 })();
 
+/* ─── Only animate what is on screen. Each demo's frame loop runs while its
+   view is in or near the viewport and stops asking for frames otherwise, so a
+   phone's GPU and main thread idle while you read the rest of the page.
+   (Browsers already pause frames in hidden tabs.) ──────────────────────── */
+function frameLoop(el, step) {
+  let onScreen = false, raf = 0;
+  const tick = () => {
+    raf = onScreen ? requestAnimationFrame(tick) : 0;
+    if (onScreen) step();
+  };
+  new IntersectionObserver(([e]) => {
+    onScreen = e.isIntersecting;
+    if (onScreen && !raf) raf = requestAnimationFrame(tick);
+  }, { rootMargin: '200px 0px' }).observe(el);
+}
+// Touch devices get 1.5x canvases instead of 2x: about 44% fewer pixels per
+// frame, and line art like these scenes still looks sharp.
+const SCENE_DPR = Math.min(window.devicePixelRatio || 1, matchMedia('(pointer: coarse)').matches ? 1.5 : 2);
+
 /* ─── 3D DEMOS: never trap the page scroll. Scrolling over a 3D view scrolls
    the page; zooming takes Ctrl/⌘ + scroll or a trackpad pinch (browsers
    report a pinch as a ctrl+wheel). On touch, one finger scrolls the page and
@@ -2333,7 +2360,7 @@ function tlpPack(vehicle, seed) {
     camera = new THREE.PerspectiveCamera(40, w / h, 1, 200000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(SCENE_DPR);
     mount.appendChild(renderer.domElement);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -2369,7 +2396,7 @@ function tlpPack(vehicle, seed) {
     });
     window.addEventListener('resize', onResize);
 
-    animate();
+    frameLoop(mount, animate);
   }
 
   function pickPackage(e) {
@@ -2415,7 +2442,6 @@ function tlpPack(vehicle, seed) {
   }
 
   function animate() {
-    requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
   }
@@ -3059,7 +3085,6 @@ function dispatchAnimateMap() {
     if (posG) posG.setAttribute('transform', `translate(${pos.x},${pos.y})`);
     if (rotG) rotG.setAttribute('transform', `rotate(${pos.angle})`);
   });
-  requestAnimationFrame(dispatchAnimateMap);
 }
 
 function dispatchRenderAll() {
@@ -3156,7 +3181,7 @@ function initDispatchDemo() {
   });
   dispatchRenderAll();
   setInterval(dispatchRenderAll, 15000);
-  requestAnimationFrame(dispatchAnimateMap);
+  frameLoop(document.getElementById('dispatch-map'), dispatchAnimateMap);
 }
 initDispatchDemo();
 
@@ -3202,7 +3227,7 @@ function initArmDemo() {
   camera.position.set(290, 220, 210);
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(w, h);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(SCENE_DPR);
   mount.appendChild(renderer.domElement);
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -3518,7 +3543,6 @@ function initArmDemo() {
 
   const FLAT = new THREE.Quaternion();
   function animate() {
-    requestAnimationFrame(animate);
     if (settle && blockMesh) {
       blockMesh.position.lerp(settle, 0.2);
       blockMesh.quaternion.slerp(FLAT, 0.2);
@@ -3535,7 +3559,7 @@ function initArmDemo() {
   buildSliders();
   setPose({ ...ARM_HOME });
   updateStatus();
-  animate();
+  frameLoop(mount, animate);
 }
 
 initArmDemo();
