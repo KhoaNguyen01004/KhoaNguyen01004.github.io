@@ -3,8 +3,8 @@
 Source for my portfolio at <https://khoanguyen01004.github.io>.
 
 One static page, no build step. Everything is in `index.html` — markup, CSS and JS
-in a single file. The only external dependencies are the Archivo webfont from Google
-Fonts and Three.js r128 from a CDN, both loaded over https.
+in a single file. The only external dependencies are the Be Vietnam Pro, JetBrains Mono
+and Inter webfonts from Google Fonts and Three.js r128 from a CDN, all loaded over https.
 
 ## Layout
 
