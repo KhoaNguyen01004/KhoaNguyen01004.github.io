@@ -470,20 +470,29 @@ nav {
   position: sticky; top: 76px; z-index: 50;
   display: flex; gap: 2px; width: max-content; max-width: 100%;
   margin-top: 36px; padding: 4px; border-radius: 999px;
-  overflow-x: auto; scrollbar-width: none;
 }
 .demo-tab {
-  font: 600 14px/1 var(--font); white-space: nowrap;
+  font: 600 14px/1 var(--font); white-space: nowrap; text-align: center;
   padding: 11px 16px; border-radius: 999px;
   color: var(--text-muted); text-decoration: none;
   transition: background-color .4s var(--spring), color .4s var(--spring);
 }
 .demo-tab:hover { color: var(--text); }
 .demo-tab.on { background: var(--text); color: var(--bg); }
+.tab-short { display: none; }
+/* Phones: a segmented control. Three equal segments with short labels, so
+   every option stays in view instead of scrolling inside the bar. */
+@media (max-width: 520px) {
+  .demo-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .demo-tab { padding: 11px 4px; font-size: 13px; }
+  .tab-long { display: none; }
+  .tab-short { display: inline; }
+}
 
 /* Stacked panels: each one after the first is visually separated so it
-   reads as its own demo while scrolling, not a continuation of the last. */
-.demo-panel { margin-top: 96px; }
+   reads as its own demo while scrolling, not a continuation of the last.
+   Jumping to one lands its title below the nav and the floating switcher. */
+.demo-panel { margin-top: 96px; scroll-margin-top: 140px; }
 .demo-panel:first-of-type { margin-top: 48px; }
 .demo-panel-title { font-size: clamp(26px, 2.8vw, 34px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.1; }
 .demo-panel-desc { max-width: 60ch; color: var(--text-muted); margin-top: 10px; text-wrap: pretty; }
@@ -1161,13 +1170,13 @@ footer { margin-top: 136px; }
 
   <div class="demo-tabs glass" id="demo-tabs">
     <a class="demo-tab on" data-demo="fleet" href="#demo-panel-fleet">
-      <span data-l="en">Fleet load planner</span><span data-l="vi">Xếp hàng đội xe</span>
+      <span data-l="en"><span class="tab-long">Fleet load planner</span><span class="tab-short">Load planner</span></span><span data-l="vi"><span class="tab-long">Xếp hàng đội xe</span><span class="tab-short">Xếp hàng</span></span>
     </a>
     <a class="demo-tab" data-demo="dispatch" href="#demo-panel-dispatch">
-      <span data-l="en">Dispatcher board</span><span data-l="vi">Bảng điều phối</span>
+      <span data-l="en"><span class="tab-long">Dispatcher board</span><span class="tab-short">Dispatcher</span></span><span data-l="vi"><span class="tab-long">Bảng điều phối</span><span class="tab-short">Điều phối</span></span>
     </a>
     <a class="demo-tab" data-demo="arm" href="#demo-panel-arm">
-      <span data-l="en">Robotic arm</span><span data-l="vi">Tay robot</span>
+      <span data-l="en"><span class="tab-long">Robotic arm</span><span class="tab-short">Robot arm</span></span><span data-l="vi">Tay robot</span>
     </a>
   </div>
 
